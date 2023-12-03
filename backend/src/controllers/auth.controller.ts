@@ -4,10 +4,24 @@ import { fromZodError } from "zod-validation-error";
 import { loginUser, registerUser } from "../services/user.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import ApiError from "../utils/error.util";
+import handleApiError from "../utils/apiErrorHandler";
 
 const registerSchema = z.object({
-  fullName: z.string(),
+  fullName: z.string().min(1),
   email: z.string().email(),
+  username: z
+    .string()
+    .min(3)
+    .refine(
+      (username) => {
+        const isValidUsername = /^\w+$/.test(username);
+        return isValidUsername;
+      },
+      {
+        message:
+          "Username must contain only letters, numbers, and underscores.",
+      }
+    ),
   password: z
     .string()
     .min(8)
@@ -33,16 +47,6 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
-function handleError(res: Response, error: unknown) {
-  console.log(error);
-  const apiError = error as ApiError;
-  res.status(apiError.statusCode).json({
-    success: apiError.success,
-    error: apiError.error,
-    message: apiError.message,
-  });
-}
-
 export async function registerController(req: Request, res: Response) {
   try {
     const parsedRequest = registerSchema.safeParse(req.body);
@@ -51,11 +55,10 @@ export async function registerController(req: Request, res: Response) {
         /"/g,
         "'"
       );
-      console.log(errorMessage);
       throw new ApiError(400, "Bad Request", errorMessage);
     }
-    const { fullName, email, password } = parsedRequest.data;
-    const token = await registerUser(fullName, email, password);
+    const { fullName, email, username, password } = parsedRequest.data;
+    const token = await registerUser(fullName, email, username, password);
 
     const apiResponse: ApiResponse = new ApiResponse(
       "User registered successfully",
@@ -65,7 +68,7 @@ export async function registerController(req: Request, res: Response) {
     );
     res.status(201).json(apiResponse);
   } catch (error) {
-    handleError(res, error);
+    handleApiError(res, error);
   }
 }
 
@@ -91,6 +94,6 @@ export async function loginController(req: Request, res: Response) {
     );
     res.status(200).json(apiResponse);
   } catch (error) {
-    handleError(res, error);
+    handleApiError(res, error);
   }
 }

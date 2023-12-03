@@ -6,10 +6,19 @@ import ApiError from "../utils/error.util";
 export async function registerUser(
   fullName: string,
   email: string,
+  username: string,
   password: string
-) {
-  const foundUser = await User.findOne({ email: email });
-  if (foundUser) {
+): Promise<string> {
+  const foundUserName = await User.findOne({ username: username });
+  if (foundUserName) {
+    throw new ApiError(
+      400,
+      "Already Exists",
+      "Username is already in use; please try a different one."
+    );
+  }
+  const foundEmail = await User.findOne({ email: email });
+  if (foundEmail) {
     throw new ApiError(
       400,
       "Already Exist",
@@ -21,6 +30,7 @@ export async function registerUser(
     const createdUser = await User.create({
       fullName: fullName,
       email: email,
+      username: username,
       password: password,
     });
     return generateToken(createdUser);

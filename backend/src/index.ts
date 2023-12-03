@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/auth", authRouter);
-app.use("/notes", postRouter);
+app.use("/post", postRouter);
 app.use("/health", healthRouter);
 
 const PORT = config.port;

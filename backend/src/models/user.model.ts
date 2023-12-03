@@ -1,16 +1,16 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { InferSchemaType, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 
-export interface IUser extends Document {
-  fullName: string;
-  email: string;
-  password: string;
-}
-
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema({
   fullName: {
     type: String,
     required: true,
+  },
+  username: {
+    type: String,
+    unique: true,
+    required: true,
+    trim: true,
   },
   email: {
     type: String,
@@ -24,6 +24,8 @@ const userSchema = new Schema<IUser>({
     required: true,
   },
 });
+
+type IUser = InferSchemaType<typeof userSchema>;
 
 userSchema.pre("save", async function (next) {
   try {

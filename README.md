@@ -2,4 +2,9 @@
 
 **work in progress!!!**
 
-- day1: login and register apis
+### Complete
+
+    - login api
+    - register api
+    - upload post
+    - get posts
