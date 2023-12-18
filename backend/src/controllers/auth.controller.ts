@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { loginUser, registerUser } from "../services/user.service";
+import { loginUser, registerUser } from "../services/auth.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";

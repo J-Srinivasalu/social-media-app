@@ -8,21 +8,27 @@ import { createPost, getPosts, likePost } from "../services/post.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { IPost } from "../models/post.model";
+import {
+  createComment,
+  getCommentsByPostId,
+  likeComment,
+} from "../services/comment.service";
+import { IComment } from "../models/comment.model";
 
-const uploadPostSchema = z.object({
+const uploadCommentSchema = z.object({
+  postId: z.string(),
   content: z.string(),
 });
 
-const likePostSchema = z.object({
-  postId: z.string(),
+const likeCommentSchema = z.object({
+  commentId: z.string(),
 });
 
-export async function uploadPostController(req: Request, res: Response) {
+export async function uploadCommentController(req: Request, res: Response) {
   try {
-    console.log("in upload controller");
     const userId = (req as AuthenticatedRequest).user.id;
 
-    const parsedRequest = uploadPostSchema.safeParse(req.body);
+    const parsedRequest = uploadCommentSchema.safeParse(req.body);
     if (!parsedRequest.success) {
       const errorMessage = fromZodError(parsedRequest.error).message.replace(
         /"/g,
@@ -31,20 +37,14 @@ export async function uploadPostController(req: Request, res: Response) {
       throw new ApiError(400, "Bad Request", errorMessage);
     }
 
-    const { content } = parsedRequest.data;
+    const { postId, content } = parsedRequest.data;
 
-    const localFilePath = req.file?.path;
-    let imageUrl;
-    if (localFilePath) {
-      imageUrl = await uploadOnCloudinary(localFilePath);
-    }
-
-    const post = await createPost(userId, content, imageUrl);
+    const comment: IComment = await createComment(userId, postId, content);
 
     const apiResponse: ApiResponse = new ApiResponse(
-      "Post Uploaded Successfully",
+      "Comment Uploaded Successfully",
       {
-        post: post,
+        comment: comment,
       }
     );
     res.status(201).json(apiResponse);
@@ -53,17 +53,26 @@ export async function uploadPostController(req: Request, res: Response) {
   }
 }
 
-export async function getPostController(req: Request, res: Response) {
+export async function getCommentController(req: Request, res: Response) {
   try {
+    const postId = req.query.postId as string;
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = parseInt(req.query.limit as string) || 10;
 
-    const posts: IPost[] = await getPosts(offset, limit);
+    if (!postId) {
+      throw new ApiError(400, "Bad Request", "Post Id is required");
+    }
+
+    const comments: IComment[] = await getCommentsByPostId(
+      postId,
+      offset,
+      limit
+    );
 
     const apiResponse: ApiResponse = new ApiResponse(
-      "Fetched Posts Successfully",
+      "Fetched Comments Successfully",
       {
-        posts: posts,
+        comments: comments,
       }
     );
     res.status(200).json(apiResponse);
@@ -72,12 +81,11 @@ export async function getPostController(req: Request, res: Response) {
   }
 }
 
-export async function likePostController(req: Request, res: Response) {
+export async function likeCommentController(req: Request, res: Response) {
   try {
-    console.log("in upload controller");
     const userId = (req as AuthenticatedRequest).user.id;
 
-    const parsedRequest = likePostSchema.safeParse(req.body);
+    const parsedRequest = likeCommentSchema.safeParse(req.body);
     if (!parsedRequest.success) {
       const errorMessage = fromZodError(parsedRequest.error).message.replace(
         /"/g,
@@ -86,11 +94,13 @@ export async function likePostController(req: Request, res: Response) {
       throw new ApiError(400, "Bad Request", errorMessage);
     }
 
-    const { postId } = parsedRequest.data;
+    const { commentId } = parsedRequest.data;
 
-    await likePost(postId, userId);
+    await likeComment(commentId, userId);
 
-    const apiResponse: ApiResponse = new ApiResponse("Post liked Successfully");
+    const apiResponse: ApiResponse = new ApiResponse(
+      "Comment liked Successfully"
+    );
     res.status(200).json(apiResponse);
   } catch (error) {
     handleApiError(res, error);

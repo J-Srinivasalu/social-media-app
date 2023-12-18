@@ -2,7 +2,7 @@ import mongoose, { InferSchemaType, Schema } from "mongoose";
 
 const postSchema = new Schema(
   {
-    user_id: { type: Schema.Types.ObjectId, ref: "User" },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
     content: { type: String },
     image: { type: String },
     likes: [{ type: String }],
@@ -13,7 +13,9 @@ const postSchema = new Schema(
   }
 );
 
-export type IPost = InferSchemaType<typeof postSchema>;
+export interface IPost extends InferSchemaType<typeof postSchema>, Document {
+  _id: mongoose.Types.ObjectId;
+}
 
 const Post = mongoose.model<IPost>("Post", postSchema);
 

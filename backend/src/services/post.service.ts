@@ -24,10 +24,31 @@ export async function createPost(
   }
 }
 
-export async function getPosts(): Promise<IPost[]> {
+export async function getPosts(
+  offset: number,
+  limit: number
+): Promise<IPost[]> {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find().skip(offset).limit(limit);
     return posts;
+  } catch (error) {
+    throw new ApiError();
+  }
+}
+
+export async function likePost(postId: string, userId: string) {
+  const foundUser = await User.findById(userId);
+  if (!foundUser) {
+    throw new ApiError(404, "Not Found", "User not found");
+  }
+
+  const foundPost = await Post.findById(postId);
+  if (!foundPost) {
+    throw new ApiError(404, "Not Found", "Post not found");
+  }
+  try {
+    foundPost.likes.push(userId);
+    foundPost.save();
   } catch (error) {
     throw new ApiError();
   }

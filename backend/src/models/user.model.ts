@@ -25,7 +25,9 @@ const userSchema = new Schema({
   },
 });
 
-type IUser = InferSchemaType<typeof userSchema>;
+export interface IUser extends InferSchemaType<typeof userSchema>, Document {
+  _id: mongoose.Types.ObjectId;
+}
 
 userSchema.pre("save", async function (next) {
   try {
