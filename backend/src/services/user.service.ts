@@ -3,11 +3,7 @@ import User, { IUser } from "../models/user.model";
 import ApiError from "../utils/error.util";
 
 export async function getUser(id: string): Promise<Omit<IUser, "password">> {
-  const user = await User.findById(id);
-
-  if (!user) {
-    throw new ApiError(404, "Not Found", "User not found");
-  }
+  const user = await checkIfUserExistThenReturnUser(id);
 
   const sanitizedUser = sanitizeUser(user);
 
@@ -19,19 +15,36 @@ function sanitizeUser(user: IUser): Omit<IUser, "password"> {
   return sanitizedUser;
 }
 
-export async function getPublicProfile(
-  username: string
-): Promise<PublicProfile> {
-  const user = await User.findOne({ username: username });
-  if (!user) {
-    throw new ApiError(404, "Not Found", "User not found");
-  }
+export async function getPublicProfile(userId: string): Promise<PublicProfile> {
+  const user = await checkIfUserExistThenReturnUser(userId);
 
   const publicProfile = new PublicProfile(
-    user.id,
+    user._id,
     user.fullName,
     user.username
   );
 
   return publicProfile;
+}
+
+export async function updateUser(
+  userId: string,
+  fullName: string,
+  profilePicUrl?: string
+): Promise<IUser> {
+  const user = await checkIfUserExistThenReturnUser(userId);
+  user.fullName = fullName;
+  user.profilePicUrl = profilePicUrl;
+
+  return user;
+}
+
+export async function checkIfUserExistThenReturnUser(
+  userId: string
+): Promise<IUser> {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "Not Found", "User not found");
+  }
+  return user;
 }

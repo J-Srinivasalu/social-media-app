@@ -13,4 +13,5 @@
     - get public profile user
     - upload comment
     - get comments (with offset and limits)
-    -
+    - update user
+    - get posts by user (with offset and limits)

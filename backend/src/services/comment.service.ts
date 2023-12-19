@@ -2,16 +2,14 @@ import Comment, { IComment } from "../models/comment.model";
 import Post from "../models/post.model";
 import User from "../models/user.model";
 import ApiError from "../utils/error.util";
+import { checkIfUserExistThenReturnUser } from "./user.service";
 
 export async function createComment(
   userId: string,
   postId: string,
   comment: string
 ) {
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(404, "Not Found", "User not found");
-  }
+  const user = checkIfUserExistThenReturnUser(userId);
 
   const newComment = Comment.create({
     userId: userId,
@@ -45,10 +43,7 @@ export async function getCommentsByPostId(
 }
 
 export async function likeComment(commentId: string, userId: string) {
-  const foundUser = await User.findById(userId);
-  if (!foundUser) {
-    throw new ApiError(404, "Not Found", "User not found");
-  }
+  const foundUser = await checkIfUserExistThenReturnUser(userId);
 
   const foundComment = await Comment.findById(commentId);
   if (!foundComment) {

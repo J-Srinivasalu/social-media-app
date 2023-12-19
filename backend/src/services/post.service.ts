@@ -1,16 +1,14 @@
 import Post, { IPost } from "../models/post.model";
 import User from "../models/user.model";
 import ApiError from "../utils/error.util";
+import { checkIfUserExistThenReturnUser } from "./user.service";
 
 export async function createPost(
   userId: string,
   content: string,
   image?: string
 ): Promise<IPost> {
-  const foundUser = await User.findById(userId);
-  if (!foundUser) {
-    throw new ApiError(404, "Not Found", "User not found");
-  }
+  const foundUser = await checkIfUserExistThenReturnUser(userId);
 
   try {
     const post = await Post.create({
@@ -36,11 +34,23 @@ export async function getPosts(
   }
 }
 
-export async function likePost(postId: string, userId: string) {
-  const foundUser = await User.findById(userId);
-  if (!foundUser) {
-    throw new ApiError(404, "Not Found", "User not found");
+export async function getPostsByUserId(
+  userId: string,
+  offset: number,
+  limit: number
+): Promise<IPost[]> {
+  try {
+    const posts: IPost[] = await Post.find({ userId: userId })
+      .skip(offset)
+      .limit(limit);
+    return posts;
+  } catch (error) {
+    throw new ApiError();
   }
+}
+
+export async function likePost(postId: string, userId: string) {
+  const foundUser = await checkIfUserExistThenReturnUser(userId);
 
   const foundPost = await Post.findById(postId);
   if (!foundPost) {
