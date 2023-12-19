@@ -1,13 +1,10 @@
 import { Request, Response } from "express";
-import z, { date } from "zod";
+import z from "zod";
 import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
-import { uploadOnCloudinary } from "../services/cloudinary.service";
 import { fromZodError } from "zod-validation-error";
-import { createPost, getPosts, likePost } from "../services/post.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
-import { IPost } from "../models/post.model";
 import {
   createComment,
   getCommentsByPostId,
@@ -27,6 +24,8 @@ const likeCommentSchema = z.object({
 export async function uploadCommentController(req: Request, res: Response) {
   try {
     const userId = (req as AuthenticatedRequest).user.id;
+
+    console.log(req.body);
 
     const parsedRequest = uploadCommentSchema.safeParse(req.body);
     if (!parsedRequest.success) {

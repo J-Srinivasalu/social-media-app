@@ -2,11 +2,10 @@ import mongoose, { InferSchemaType, Schema } from "mongoose";
 
 const postSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
     content: { type: String },
-    image: { type: String },
+    medias: [{ type: String }],
     likes: [{ type: String }],
-    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   {
     timestamps: true,

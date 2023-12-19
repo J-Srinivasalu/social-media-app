@@ -3,6 +3,7 @@ import { authenticate } from "../middlewares/auth.middleware";
 import { upload } from "../middlewares/multer.middleware";
 import {
   getPostController,
+  getPostsByUserController,
   likePostController,
   uploadPostController,
 } from "../controllers/post.controller";
@@ -14,11 +15,15 @@ postRouter.get("/", authenticate, (req: Request, res: Response) => {
   getPostController(req, res);
 });
 
+postRouter.get("/:userId", authenticate, (req: Request, res: Response) => {
+  getPostsByUserController(req, res);
+});
+
 //create post
 postRouter.post(
   "/upload",
   authenticate,
-  upload.single("image"),
+  upload.array("medias"),
   (req: Request, res: Response) => {
     uploadPostController(req, res);
   }

@@ -11,7 +11,6 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import ApiError from "../utils/error.util";
 import { PublicProfile } from "../models/publicProfile.model";
-import { IUser } from "../models/user.model";
 import { uploadOnCloudinary } from "../services/cloudinary.service";
 
 export async function getUserController(req: Request, res: Response) {
@@ -30,23 +29,9 @@ export async function getUserController(req: Request, res: Response) {
   }
 }
 
-const getPublicProfileSchema = z.object({
-  userId: z.string(),
-});
-
 export async function getPublicProfileController(req: Request, res: Response) {
   try {
-    const parsedRequest = getPublicProfileSchema.safeParse(req.body);
-
-    if (!parsedRequest.success) {
-      const errorMessage = fromZodError(parsedRequest.error).message.replace(
-        /"/g,
-        "'"
-      );
-      throw new ApiError(400, "Bad Request", errorMessage);
-    }
-
-    const { userId } = parsedRequest.data;
+    const userId = req.params.userId as string;
 
     const publicProfile: PublicProfile = await getPublicProfile(userId);
 
@@ -88,7 +73,11 @@ export async function updateUserController(req: Request, res: Response) {
       profilePicUrl = await uploadOnCloudinary(localFilePath);
     }
 
-    const user: IUser = await updateUser(userId, fullName, profilePicUrl);
+    const user: PublicProfile = await updateUser(
+      userId,
+      fullName,
+      profilePicUrl
+    );
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Updated User Details Successfully",

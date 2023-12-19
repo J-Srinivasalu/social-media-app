@@ -36,7 +36,7 @@ export async function getCommentsByPostId(
     .limit(limit)
     .populate({
       path: "userId",
-      select: "fullName username",
+      select: "userId fullName username",
     });
 
   return comments;

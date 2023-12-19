@@ -4,7 +4,12 @@ import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
 import { uploadOnCloudinary } from "../services/cloudinary.service";
 import { fromZodError } from "zod-validation-error";
-import { createPost, getPosts, likePost } from "../services/post.service";
+import {
+  createPost,
+  getPosts,
+  getPostsByUserId,
+  likePost,
+} from "../services/post.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { IPost } from "../models/post.model";
@@ -33,13 +38,22 @@ export async function uploadPostController(req: Request, res: Response) {
 
     const { content } = parsedRequest.data;
 
-    const localFilePath = req.file?.path;
-    let imageUrl;
-    if (localFilePath) {
-      imageUrl = await uploadOnCloudinary(localFilePath);
-    }
+    const filePromises: string[] = (req.files as any).map(
+      async (file: Express.Multer.File) => {
+        const localFilePath = file.path;
+        let imageUrl;
 
-    const post = await createPost(userId, content, imageUrl);
+        if (localFilePath) {
+          imageUrl = await uploadOnCloudinary(localFilePath);
+        }
+
+        return imageUrl;
+      }
+    );
+
+    const uploadedImageUrls = await Promise.all(filePromises);
+
+    const post = await createPost(userId, content, uploadedImageUrls);
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Post Uploaded Successfully",
@@ -59,6 +73,26 @@ export async function getPostController(req: Request, res: Response) {
     const limit = parseInt(req.query.limit as string) || 10;
 
     const posts: IPost[] = await getPosts(offset, limit);
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "Fetched Posts Successfully",
+      {
+        posts: posts,
+      }
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+export async function getPostsByUserController(req: Request, res: Response) {
+  try {
+    const offset = parseInt(req.query.offset as string) || 0;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const userId = req.params.userId as string;
+
+    const posts: IPost[] = await getPostsByUserId(userId, offset, limit);
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Fetched Posts Successfully",

@@ -12,14 +12,14 @@ const userRouter = Router();
 userRouter.get("/", authenticate, (req: Request, res: Response) => {
   getUserController(req, res);
 });
-userRouter.get("/public", authenticate, (req: Request, res: Response) => {
+userRouter.get("/:userId", authenticate, (req: Request, res: Response) => {
   getPublicProfileController(req, res);
 });
 
 userRouter.post(
   "/",
   authenticate,
-  upload.single("image"),
+  upload.single("profilePic"),
   (req: Request, res: Response) => {
     updateUserController(req, res);
   }

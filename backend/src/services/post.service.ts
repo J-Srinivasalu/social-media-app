@@ -6,16 +6,22 @@ import { checkIfUserExistThenReturnUser } from "./user.service";
 export async function createPost(
   userId: string,
   content: string,
-  image?: string
+  medias?: string[]
 ): Promise<IPost> {
   const foundUser = await checkIfUserExistThenReturnUser(userId);
 
   try {
     const post = await Post.create({
-      user_id: userId,
+      user: foundUser._id,
       content: content,
-      image: image,
+      medias: medias,
     });
+
+    post.populate({
+      path: "user",
+      select: "userId fullName username",
+    });
+
     return post;
   } catch (error) {
     throw new ApiError();
@@ -27,7 +33,10 @@ export async function getPosts(
   limit: number
 ): Promise<IPost[]> {
   try {
-    const posts = await Post.find().skip(offset).limit(limit);
+    const posts = await Post.find().skip(offset).limit(limit).populate({
+      path: "user",
+      select: "userId fullName username",
+    });
     return posts;
   } catch (error) {
     throw new ApiError();
@@ -42,7 +51,11 @@ export async function getPostsByUserId(
   try {
     const posts: IPost[] = await Post.find({ userId: userId })
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .populate({
+        path: "user",
+        select: "userId fullName username",
+      });
     return posts;
   } catch (error) {
     throw new ApiError();
