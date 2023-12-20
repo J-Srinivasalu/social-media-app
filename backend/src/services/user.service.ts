@@ -1,5 +1,5 @@
 import { PublicProfile } from "../models/publicProfile.model";
-import User, { IUser } from "../models/user.model";
+import User from "../models/user.model";
 import ApiError from "../utils/error.util";
 
 export async function getUser(id: string): Promise<PublicProfile> {

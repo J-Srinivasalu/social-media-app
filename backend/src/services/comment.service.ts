@@ -1,6 +1,5 @@
 import Comment, { IComment } from "../models/comment.model";
 import Post from "../models/post.model";
-import User from "../models/user.model";
 import ApiError from "../utils/error.util";
 import { checkIfUserExistThenReturnUser } from "./user.service";
 
@@ -9,10 +8,10 @@ export async function createComment(
   postId: string,
   comment: string
 ) {
-  const user = checkIfUserExistThenReturnUser(userId);
+  const user = await checkIfUserExistThenReturnUser(userId);
 
   const newComment = Comment.create({
-    userId: userId,
+    userId: user._id,
     postId: postId,
     comment: comment,
   });
@@ -43,7 +42,7 @@ export async function getCommentsByPostId(
 }
 
 export async function likeComment(commentId: string, userId: string) {
-  const foundUser = await checkIfUserExistThenReturnUser(userId);
+  await checkIfUserExistThenReturnUser(userId);
 
   const foundComment = await Comment.findById(commentId);
   if (!foundComment) {

@@ -1,5 +1,4 @@
 import Post, { IPost } from "../models/post.model";
-import User from "../models/user.model";
 import ApiError from "../utils/error.util";
 import { checkIfUserExistThenReturnUser } from "./user.service";
 
@@ -49,7 +48,9 @@ export async function getPostsByUserId(
   limit: number
 ): Promise<IPost[]> {
   try {
-    const posts: IPost[] = await Post.find({ userId: userId })
+    const foundUser = await checkIfUserExistThenReturnUser(userId);
+
+    const posts: IPost[] = await Post.find({ userId: foundUser._id })
       .skip(offset)
       .limit(limit)
       .populate({
@@ -63,7 +64,7 @@ export async function getPostsByUserId(
 }
 
 export async function likePost(postId: string, userId: string) {
-  const foundUser = await checkIfUserExistThenReturnUser(userId);
+  await checkIfUserExistThenReturnUser(userId);
 
   const foundPost = await Post.findById(postId);
   if (!foundPost) {

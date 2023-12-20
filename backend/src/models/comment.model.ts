@@ -1,6 +1,4 @@
 import mongoose, { Document, InferSchemaType, Schema } from "mongoose";
-import { IUser } from "./user.model";
-import { IPost } from "./post.model";
 
 const commentSchema = new Schema(
   {
