@@ -31,7 +31,7 @@ export async function getUserController(req: Request, res: Response) {
 
 export async function getPublicProfileController(req: Request, res: Response) {
   try {
-    const userId = req.params.userId as string;
+    const userId = req.params.userId;
 
     const publicProfile: PublicProfile = await getPublicProfile(userId);
 

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import z, { date } from "zod";
+import z from "zod";
 import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
 import { uploadOnCloudinary } from "../services/cloudinary.service";
@@ -22,6 +22,7 @@ const likePostSchema = z.object({
   postId: z.string(),
 });
 
+// upload post
 export async function uploadPostController(req: Request, res: Response) {
   try {
     console.log("in upload controller");
@@ -67,6 +68,7 @@ export async function uploadPostController(req: Request, res: Response) {
   }
 }
 
+//get posts with limits and offset
 export async function getPostController(req: Request, res: Response) {
   try {
     const offset = parseInt(req.query.offset as string) || 0;
@@ -86,11 +88,12 @@ export async function getPostController(req: Request, res: Response) {
   }
 }
 
+// get posts for a specific user
 export async function getPostsByUserController(req: Request, res: Response) {
   try {
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = parseInt(req.query.limit as string) || 10;
-    const userId = req.params.userId as string;
+    const userId = req.params.userId;
 
     const posts: IPost[] = await getPostsByUserId(userId, offset, limit);
 
@@ -106,6 +109,7 @@ export async function getPostsByUserController(req: Request, res: Response) {
   }
 }
 
+//like post
 export async function likePostController(req: Request, res: Response) {
   try {
     console.log("in upload controller");

@@ -1,0 +1,381 @@
+{
+	"info": {
+		"_postman_id": "9df8b6e5-2ce7-4cfa-a43f-cfa72896e351",
+		"name": "Social Media Clone",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "30264869"
+	},
+	"item": [
+		{
+			"name": "post",
+			"item": [
+				{
+					"name": "upload post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "medias",
+									"type": "file",
+									"src": [
+										"/C:/Users/srini/Downloads/8-5zY8d7JtBEgqh91.png",
+										"/C:/Users/srini/Downloads/profile.png"
+									]
+								},
+								{
+									"key": "content",
+									"value": "Post3 reupload by sparrow with 2 images Irure veniam do voluptate laboris eiusmod ex eu deserunt sunt exercitation aliquip occaecat. Esse exercitation cillum esse mollit eiusmod esse tempor Lorem duis pariatur incididunt. Do commodo sunt adipisicing do anim. Sit culpa reprehenderit culpa reprehenderit eu nulla magna. Non ullamco aute do adipisicing exercitation proident esse excepteur cupidatat. Sint incididunt enim magna excepteur veniam tempor eu. Duis eiusmod exercitation aliquip ex do nostrud ea anim labore sit Lorem pariatur id.\n\nOccaecat veniam elit et ea aliquip excepteur eiusmod culpa amet elit et ipsum consectetur. Duis culpa incididunt do adipisicing sunt culpa cupidatat ea aliqua. Sit mollit laborum mollit nulla proident aliquip reprehenderit enim aliquip adipisicing nisi eu. Cillum adipisicing quis consectetur aliquip ad esse cillum nostrud enim et et laborum enim id.\n\nSit commodo ullamco cupidatat anim excepteur nostrud consequat exercitation cillum ad consequat reprehenderit. Veniam duis do Lorem ullamco anim velit dolor deserunt. Sunt est voluptate excepteur ex eu tempor dolor. Consectetur aute dolor aliqua nisi nostrud reprehenderit ullamco ullamco.\n\nEsse ad dolor laborum ex sit cupidatat deserunt. Occaecat dolore deserunt do eu reprehenderit voluptate non mollit laboris. Incididunt est officia pariatur amet Lorem non proident duis culpa enim esse incididunt voluptate. Occaecat adipisicing irure in exercitation in laboris sit quis exercitation. Excepteur consequat anim ipsum excepteur pariatur exercitation nulla id. Consequat nostrud ullamco dolore non.\n\nSunt amet commodo est cillum culpa quis mollit ipsum tempor ex excepteur. Aliquip qui nisi ea sit ut. Ea non labore quis voluptate elit pariatur occaecat aliqua fugiat excepteur id laboris adipisicing. Dolore sunt pariatur dolore aute amet ut laboris ullamco veniam nostrud labore nulla. Enim qui eu sint et voluptate laboris in qui do. Ex ipsum minim consequat in occaecat mollit proident aliqua.",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://localhost:4000/post/upload"
+					},
+					"response": []
+				},
+				{
+					"name": "like post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postId\": \"post id\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/post/like"
+					},
+					"response": []
+				},
+				{
+					"name": "get posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:4000/post?offset=0&limit=20",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"post"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get post by users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:4000/post?offset=0&limit=20&userId=userid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"post"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "userId",
+									"value": "userid"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "comments",
+			"item": [
+				{
+					"name": "like comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"commentId\": \"comment id\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/comment/like"
+					},
+					"response": []
+				},
+				{
+					"name": "get comments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:4000/comment?offset=0&limit=20&postId=postid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"comment"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "postId",
+									"value": "postid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload comment by post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postId\": \"post id\",\r\n    \"content\":\"This is a comment 1 by jack\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/comment/upload"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\": \"username\",\r\n    \"email\": \"user@mail.com\",\r\n    \"username\": \"username\",\r\n    \"password\": \"Password@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"user@mail.com\",\r\n    \"password\": \"Password@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:4000/auth/login"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "get public profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": "http://localhost:4000/user/userid"
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fullName",
+									"value": "user new name",
+									"type": "text"
+								},
+								{
+									"key": "profilePic",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": "http://localhost:4000/user"
+					},
+					"response": []
+				},
+				{
+					"name": "get user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": "http://localhost:4000/user"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "DEV_URL",
+			"value": "http://localhost:4000",
+			"type": "string"
+		},
+		{
+			"key": "PROD_URL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
