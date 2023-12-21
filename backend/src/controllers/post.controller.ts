@@ -98,7 +98,7 @@ export async function getPostsByUserController(req: Request, res: Response) {
     const posts: IPost[] = await getPostsByUserId(userId, offset, limit);
 
     const apiResponse: ApiResponse = new ApiResponse(
-      "Fetched Posts Successfully",
+      `Fetched posts for user successfully`,
       {
         posts: posts,
       }

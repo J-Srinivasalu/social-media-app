@@ -50,13 +50,14 @@ export async function getPostsByUserId(
   try {
     const foundUser = await checkIfUserExistThenReturnUser(userId);
 
-    const posts: IPost[] = await Post.find({ userId: foundUser._id })
+    const posts = await Post.find({ user: foundUser._id })
       .skip(offset)
       .limit(limit)
       .populate({
         path: "user",
         select: "userId fullName username",
       });
+
     return posts;
   } catch (error) {
     throw new ApiError();
