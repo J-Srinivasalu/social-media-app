@@ -3,20 +3,15 @@ import { authenticate } from "../middlewares/auth.middleware";
 import { upload } from "../middlewares/multer.middleware";
 import {
   getPostController,
-  getPostsByUserController,
+  getPostsController,
   likePostController,
   uploadPostController,
 } from "../controllers/post.controller";
 
 const postRouter = Router();
 
-//get posts
 postRouter.get("/", authenticate, (req: Request, res: Response) => {
-  getPostController(req, res);
-});
-
-postRouter.get("/:userId", authenticate, (req: Request, res: Response) => {
-  getPostsByUserController(req, res);
+  getPostsController(req, res);
 });
 
 //create post

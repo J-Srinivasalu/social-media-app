@@ -89,13 +89,15 @@ export async function getPostController(req: Request, res: Response) {
 }
 
 // get posts for a specific user
-export async function getPostsByUserController(req: Request, res: Response) {
+export async function getPostsController(req: Request, res: Response) {
   try {
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = parseInt(req.query.limit as string) || 10;
-    const userId = req.params.userId;
-
-    const posts: IPost[] = await getPostsByUserId(userId, offset, limit);
+    const userId = req.query.userId as string;
+    const posts: IPost[] =
+      userId != null && userId.length > 0
+        ? await getPostsByUserId(userId, offset, limit)
+        : await getPosts(offset, limit);
 
     const apiResponse: ApiResponse = new ApiResponse(
       `Fetched posts for user successfully`,

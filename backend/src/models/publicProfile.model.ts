@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export class PublicProfile {
-  userId: Types.ObjectId;
+  _id: Types.ObjectId;
   fullName: string;
   username: string;
   profilePic: string | undefined | null;
@@ -11,7 +11,7 @@ export class PublicProfile {
     username: string,
     profilePic: string | undefined | null
   ) {
-    this.userId = userId;
+    this._id = userId;
     this.fullName = fullName;
     this.username = username;
     this.profilePic = profilePic;

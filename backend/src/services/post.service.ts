@@ -55,11 +55,12 @@ export async function getPostsByUserId(
       .limit(limit)
       .populate({
         path: "user",
-        select: "userId fullName username",
+        select: "_id fullName username profilePic",
       });
 
     return posts;
   } catch (error) {
+    console.log(error);
     throw new ApiError();
   }
 }
