@@ -30,6 +30,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     ) as DecodedToken;
 
     (req as AuthenticatedRequest).user = decoded;
+    console.log("User is authorized");
     next();
   } catch (error) {
     handleJwtError(res, error);
@@ -48,7 +49,6 @@ function handleJwtError(res: Response, error: any) {
       new ApiError(401, "Unauthorized", "Token not yet valid")
     );
   } else {
-    console.error(error);
     return handleApiError(
       res,
       new ApiError(401, "Unauthorized", "Invalid token")

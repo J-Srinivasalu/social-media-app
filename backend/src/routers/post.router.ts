@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { authenticate } from "../middlewares/auth.middleware";
-import { upload } from "../middlewares/multer.middleware";
+import { handleMulterError, upload } from "../middlewares/multer.middleware";
 import {
   getPostsController,
   likePostController,
@@ -18,6 +18,7 @@ postRouter.post(
   "/upload",
   authenticate,
   upload.array("medias"),
+  handleMulterError,
   (req: Request, res: Response) => {
     uploadPostController(req, res);
   }

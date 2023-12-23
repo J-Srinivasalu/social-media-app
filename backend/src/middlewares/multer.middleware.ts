@@ -33,6 +33,7 @@ export function handleMulterError(
   next: NextFunction
 ) {
   if (err instanceof multer.MulterError) {
+    console.log("Mutler error occured");
     next(
       new ApiError(
         400,
@@ -41,8 +42,10 @@ export function handleMulterError(
       )
     );
   } else if (err) {
+    console.log("Someothere error occured");
     next(new ApiError());
   } else {
+    console.log("File uploaded successfully");
     next();
   }
 }
