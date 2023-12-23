@@ -43,6 +43,8 @@ export function handleMulterError(
     );
   } else if (err) {
     console.log("Someothere error occured");
+    console.log(err);
+    console.log("problem ended");
     next(new ApiError());
   } else {
     console.log("File uploaded successfully");
