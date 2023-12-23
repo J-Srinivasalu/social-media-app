@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+  if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
     cb({ message: "Unsupported file format" }, false);
@@ -45,7 +45,7 @@ export function handleMulterError(
     console.log("Someothere error occured");
     console.log(err);
     console.log("problem ended");
-    next(new ApiError());
+    next(new ApiError(404, "Bad Request", "Unsupported file format"));
   } else {
     console.log("File uploaded successfully");
     next();
