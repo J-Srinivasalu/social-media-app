@@ -35,6 +35,7 @@ export async function registerUser(
     });
     return generateToken(createdUser);
   } catch (error) {
+    console.log(error);
     throw new ApiError();
   }
 }

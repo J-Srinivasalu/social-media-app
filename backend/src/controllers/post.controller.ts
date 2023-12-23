@@ -6,7 +6,6 @@ import { uploadOnCloudinary } from "../services/cloudinary.service";
 import { fromZodError } from "zod-validation-error";
 import {
   createPost,
-  getPosts,
   getPostsByUserId,
   likePost,
 } from "../services/post.service";
@@ -68,27 +67,7 @@ export async function uploadPostController(req: Request, res: Response) {
   }
 }
 
-//get posts with limits and offset
-export async function getPostController(req: Request, res: Response) {
-  try {
-    const offset = parseInt(req.query.offset as string) || 0;
-    const limit = parseInt(req.query.limit as string) || 10;
-
-    const posts: IPost[] = await getPosts(offset, limit);
-
-    const apiResponse: ApiResponse = new ApiResponse(
-      "Fetched Posts Successfully",
-      {
-        posts: posts,
-      }
-    );
-    res.status(200).json(apiResponse);
-  } catch (error) {
-    handleApiError(res, error);
-  }
-}
-
-// get posts for a specific user
+// get posts
 export async function getPostsController(req: Request, res: Response) {
   try {
     const offset = parseInt(req.query.offset as string) || 0;

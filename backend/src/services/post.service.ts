@@ -16,13 +16,15 @@ export async function createPost(
       medias: medias,
     });
 
-    post.populate({
+    // Query for the created post and populate the 'user' field
+    const populatedPost = await Post.findById(post._id).populate({
       path: "user",
-      select: "userId fullName username",
+      select: "_id fullName username profilePicUrl",
     });
 
-    return post;
+    return populatedPost!!;
   } catch (error) {
+    console.log(error);
     throw new ApiError();
   }
 }
@@ -34,10 +36,12 @@ export async function getPosts(
   try {
     const posts = await Post.find().skip(offset).limit(limit).populate({
       path: "user",
-      select: "userId fullName username",
+      select: "_id fullName username profilePicUrl",
     });
+
     return posts;
   } catch (error) {
+    console.log(error);
     throw new ApiError();
   }
 }
@@ -55,7 +59,7 @@ export async function getPostsByUserId(
       .limit(limit)
       .populate({
         path: "user",
-        select: "_id fullName username profilePic",
+        select: "_id fullName username profilePicUrl",
       });
 
     return posts;
@@ -76,6 +80,7 @@ export async function likePost(postId: string, userId: string) {
     foundPost.likes.push(userId);
     foundPost.save();
   } catch (error) {
+    console.log(error);
     throw new ApiError();
   }
 }

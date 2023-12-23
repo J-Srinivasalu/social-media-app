@@ -1,3 +1,4 @@
+import { populate } from "dotenv";
 import Comment, { IComment } from "../models/comment.model";
 import Post from "../models/post.model";
 import ApiError from "../utils/error.util";
@@ -7,7 +8,7 @@ export async function createComment(
   userId: string,
   postId: string,
   comment: string
-) {
+): Promise<IComment> {
   const user = await checkIfUserExistThenReturnUser(userId);
   const post = await Post.findById(postId);
 
@@ -15,16 +16,21 @@ export async function createComment(
     throw new ApiError(404, "Not Found", "Post not found");
   }
 
-  const newComment = Comment.create({
+  const newComment = await Comment.create({
     user: user._id,
     postId: postId,
     comment: comment,
   });
+
+  const populatedComment = await Comment.findById(newComment._id)
+    .populate({ path: "user", select: "_id fullName username profilePicUrl" })
+    .exec();
+
   //update comment count in post
   post.comments = post.comments == null ? 0 : post.comments + 1;
   post.save();
 
-  return newComment;
+  return populatedComment!!;
 }
 
 export async function getCommentsByPostId(
@@ -43,7 +49,7 @@ export async function getCommentsByPostId(
     .limit(limit)
     .populate({
       path: "user",
-      select: "_id fullName username",
+      select: "_id fullName username profilePicUrl",
     });
 
   return comments;
