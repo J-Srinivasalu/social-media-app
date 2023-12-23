@@ -1,4 +1,3 @@
-import { populate } from "dotenv";
 import Comment, { IComment } from "../models/comment.model";
 import Post from "../models/post.model";
 import ApiError from "../utils/error.util";
@@ -19,7 +18,7 @@ export async function createComment(
   const newComment = await Comment.create({
     user: user._id,
     postId: postId,
-    comment: comment,
+    content: comment,
   });
 
   const populatedComment = await Comment.findById(newComment._id)

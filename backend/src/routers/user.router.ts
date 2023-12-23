@@ -5,7 +5,7 @@ import {
   updateUserController,
 } from "../controllers/user.controller";
 import { authenticate } from "../middlewares/auth.middleware";
-import { upload } from "../middlewares/multer.middleware";
+import { handleMulterError, upload } from "../middlewares/multer.middleware";
 
 const userRouter = Router();
 
@@ -20,6 +20,7 @@ userRouter.post(
   "/",
   authenticate,
   upload.single("profilePic"),
+  handleMulterError,
   (req: Request, res: Response) => {
     updateUserController(req, res);
   }

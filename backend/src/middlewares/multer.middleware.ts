@@ -1,5 +1,6 @@
-import { Request } from "express";
+import { NextFunction, Request, Response } from "express";
 import multer from "multer";
+import ApiError from "../utils/error.util";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,5 +23,26 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // file size limit 5 MB
 });
+
+export function handleMulterError(
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (err instanceof multer.MulterError) {
+    next(
+      new ApiError(
+        400,
+        "File too large",
+        "The file you are trying to upload exceeds the allowed size limit(5MB). Please choose a smaller file."
+      )
+    );
+  } else if (err) {
+    next(new ApiError());
+  } else {
+    next();
+  }
+}
