@@ -5,6 +5,7 @@ const postSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "User" },
     content: { type: String },
     medias: [{ type: String }],
+    comments: { type: Number, default: 0 },
     likes: [{ type: String }],
   },
   {

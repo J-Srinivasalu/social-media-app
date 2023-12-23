@@ -100,7 +100,7 @@ export async function getPostsController(req: Request, res: Response) {
         : await getPosts(offset, limit);
 
     const apiResponse: ApiResponse = new ApiResponse(
-      `Fetched posts for user successfully`,
+      `Fetched posts successfully`,
       {
         posts: posts,
       }

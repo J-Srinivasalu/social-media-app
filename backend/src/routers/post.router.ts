@@ -2,7 +2,6 @@ import { Router, Request, Response } from "express";
 import { authenticate } from "../middlewares/auth.middleware";
 import { upload } from "../middlewares/multer.middleware";
 import {
-  getPostController,
   getPostsController,
   likePostController,
   uploadPostController,

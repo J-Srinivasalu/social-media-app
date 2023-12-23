@@ -6,12 +6,12 @@ export class PublicProfile {
   username: string;
   profilePic: string | undefined | null;
   constructor(
-    userId: Types.ObjectId,
+    _id: Types.ObjectId,
     fullName: string,
     username: string,
     profilePic: string | undefined | null
   ) {
-    this._id = userId;
+    this._id = _id;
     this.fullName = fullName;
     this.username = username;
     this.profilePic = profilePic;

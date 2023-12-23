@@ -9,12 +9,20 @@ export async function createComment(
   comment: string
 ) {
   const user = await checkIfUserExistThenReturnUser(userId);
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw new ApiError(404, "Not Found", "Post not found");
+  }
 
   const newComment = Comment.create({
-    userId: user._id,
+    user: user._id,
     postId: postId,
     comment: comment,
   });
+  //update comment count in post
+  post.comments = post.comments == null ? 0 : post.comments + 1;
+  post.save();
 
   return newComment;
 }
@@ -34,8 +42,8 @@ export async function getCommentsByPostId(
     .skip(offset)
     .limit(limit)
     .populate({
-      path: "userId",
-      select: "userId fullName username",
+      path: "user",
+      select: "_id fullName username",
     });
 
   return comments;
