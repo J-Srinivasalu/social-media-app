@@ -6,6 +6,7 @@ import { uploadOnCloudinary } from "../services/cloudinary.service";
 import { fromZodError } from "zod-validation-error";
 import {
   createPost,
+  getPosts,
   getPostsByUserId,
   likePost,
 } from "../services/post.service";
