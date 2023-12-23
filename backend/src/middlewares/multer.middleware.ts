@@ -13,6 +13,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
+  console.log(`filetype: ${file.mimetype}`);
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
