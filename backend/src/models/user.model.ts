@@ -19,7 +19,7 @@ const userSchema = new Schema({
     lowercase: true,
     trim: true,
   },
-  profilePicUrl: {
+  profilePic: {
     type: String,
   },
   password: {

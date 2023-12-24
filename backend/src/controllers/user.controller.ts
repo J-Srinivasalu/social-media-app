@@ -68,16 +68,12 @@ export async function updateUserController(req: Request, res: Response) {
     const { fullName } = parsedRequest.data;
 
     const localFilePath = req.file?.path;
-    let profilePicUrl;
+    let profilePic;
     if (localFilePath) {
-      profilePicUrl = await uploadOnCloudinary(localFilePath);
+      profilePic = await uploadOnCloudinary(localFilePath);
     }
 
-    const user: PublicProfile = await updateUser(
-      userId,
-      fullName,
-      profilePicUrl
-    );
+    const user: PublicProfile = await updateUser(userId, fullName, profilePic);
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Updated User Details Successfully",

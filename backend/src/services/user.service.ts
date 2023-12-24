@@ -11,7 +11,7 @@ export async function getUser(id: string): Promise<PublicProfile> {
     user._id,
     user.fullName,
     user.username,
-    user.profilePicUrl
+    user.profilePic
   );
 
   return publicProfile;
@@ -24,7 +24,7 @@ export async function getPublicProfile(userId: string): Promise<PublicProfile> {
     user._id,
     user.fullName,
     user.username,
-    user.profilePicUrl
+    user.profilePic
   );
 
   return publicProfile;
@@ -33,11 +33,11 @@ export async function getPublicProfile(userId: string): Promise<PublicProfile> {
 export async function updateUser(
   userId: string,
   fullName: string,
-  profilePicUrl?: string
+  profilePic?: string
 ): Promise<PublicProfile> {
   const user = await checkIfUserExistThenReturnUser(userId);
   user.fullName = fullName;
-  user.profilePicUrl = profilePicUrl;
+  user.profilePic = profilePic;
 
   user.save();
   console.log(user);
@@ -46,7 +46,7 @@ export async function updateUser(
     user._id,
     user.fullName,
     user.username,
-    user.profilePicUrl
+    user.profilePic
   );
 
   return publicProfile;

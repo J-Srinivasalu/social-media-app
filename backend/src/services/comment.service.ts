@@ -22,7 +22,7 @@ export async function createComment(
   });
 
   const populatedComment = await Comment.findById(newComment._id)
-    .populate({ path: "user", select: "_id fullName username profilePicUrl" })
+    .populate({ path: "user", select: "_id fullName username profilePic" })
     .exec();
 
   //update comment count in post
@@ -49,7 +49,7 @@ export async function getCommentsByPostId(
     .limit(limit)
     .populate({
       path: "user",
-      select: "_id fullName username profilePicUrl",
+      select: "_id fullName username profilePic",
     });
 
   return comments;
