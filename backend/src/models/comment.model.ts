@@ -10,6 +10,8 @@ const commentSchema = new Schema(
   { timestamps: true }
 );
 
+commentSchema.index({ createdAt: -1 });
+
 export interface IComment
   extends InferSchemaType<typeof commentSchema>,
     Document {

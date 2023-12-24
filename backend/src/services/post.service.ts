@@ -34,10 +34,14 @@ export async function getPosts(
   limit: number
 ): Promise<IPost[]> {
   try {
-    const posts = await Post.find().skip(offset).limit(limit).populate({
-      path: "user",
-      select: "_id fullName username profilePicUrl",
-    });
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .populate({
+        path: "user",
+        select: "_id fullName username profilePicUrl",
+      });
 
     return posts;
   } catch (error) {
@@ -55,6 +59,7 @@ export async function getPostsByUserId(
     const foundUser = await checkIfUserExistThenReturnUser(userId);
 
     const posts = await Post.find({ user: foundUser._id })
+      .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
       .populate({

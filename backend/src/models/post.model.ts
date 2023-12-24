@@ -13,6 +13,8 @@ const postSchema = new Schema(
   }
 );
 
+postSchema.index({ createdAt: -1 });
+
 export interface IPost extends InferSchemaType<typeof postSchema>, Document {
   _id: mongoose.Types.ObjectId;
 }

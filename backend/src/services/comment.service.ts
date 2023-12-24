@@ -44,6 +44,7 @@ export async function getCommentsByPostId(
   }
 
   const comments = await Comment.find({ postId: post._id })
+    .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit)
     .populate({
