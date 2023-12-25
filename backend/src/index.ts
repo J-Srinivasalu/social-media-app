@@ -7,6 +7,7 @@ import healthRouter from "./routers/health.router";
 import connectDb from "./db/db";
 import userRouter from "./routers/user.router";
 import commentRouter from "./routers/comment.router";
+import friendRouter from "./routers/friend.router";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use("/post", postRouter);
 app.use("/health", healthRouter);
 app.use("/user", userRouter);
 app.use("/comment", commentRouter);
+app.use("/friend", friendRouter);
 
 const PORT = config.port;
 
