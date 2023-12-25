@@ -52,6 +52,17 @@ export async function updateUser(
   return publicProfile;
 }
 
+export async function setFcmToken(
+  userId: string,
+  fcmToken: string
+): Promise<void> {
+  const user = await checkIfUserExistThenReturnUser(userId);
+  user.fcmToken = fcmToken;
+
+  console.log(user);
+  user.save();
+}
+
 export async function checkIfUserExistThenReturnUser(userId: string) {
   const user = await User.findById(userId);
   if (!user) {

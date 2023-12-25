@@ -26,6 +26,28 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  friendRequestSent: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      status: {
+        type: String,
+        enum: ["pending", "accepted", "rejected"],
+        default: "pending",
+      },
+    },
+  ],
+  friendRequestReceived: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      status: {
+        type: String,
+        enum: ["pending", "accepted", "rejected"],
+        default: "pending",
+      },
+    },
+  ],
+  friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  fcmToken: { type: String },
 });
 
 export interface IUser extends InferSchemaType<typeof userSchema>, Document {

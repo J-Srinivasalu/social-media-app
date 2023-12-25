@@ -5,6 +5,7 @@ import {
   getPublicProfile,
   getUser,
   updateUser,
+  setFcmToken,
 } from "../services/user.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import { z } from "zod";
@@ -80,6 +81,37 @@ export async function updateUserController(req: Request, res: Response) {
       {
         user: user,
       }
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+const setFcmTokenSchema = z.object({
+  fcmToken: z.string(),
+});
+
+export async function setFcmTokenController(req: Request, res: Response) {
+  try {
+    const parsedRequest = setFcmTokenSchema.safeParse(req.body);
+
+    if (!parsedRequest.success) {
+      const errorMessage = fromZodError(parsedRequest.error).message.replace(
+        /"/g,
+        "'"
+      );
+      throw new ApiError(400, "Bad Request", errorMessage);
+    }
+
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    const { fcmToken } = parsedRequest.data;
+
+    await setFcmToken(userId, fcmToken);
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "FCM Token added/updated Successfully"
     );
     res.status(200).json(apiResponse);
   } catch (error) {
