@@ -41,6 +41,35 @@ export async function sendFriendRequest(userId: string, recieverId: string) {
 }
 
 /*
+param userId : user id of signin user
+param recieverId : user id of the user to unfriend
+*/
+export async function sendUnfriendRequest(userId: string, recieverId: string) {
+  const user = await checkIfUserExistThenReturnUser(userId);
+  const reciever = await checkIfUserExistThenReturnUser(recieverId);
+
+  user.friends = user.friends.filter(
+    (id) => id.toString() !== reciever._id.toString()
+  );
+
+  reciever.friends = reciever.friends.filter(
+    (id) => id.toString() !== user._id.toString()
+  );
+
+  await user.save();
+  await reciever.save();
+  if (reciever.fcmToken) {
+    sendNotificationToSingleUser(
+      reciever.fcmToken,
+      "Unfriend request",
+      `${user.fullName} unfriended you`
+    );
+  } else {
+    console.log("Notification not sent, as reciever doesn't have fcmToken");
+  }
+}
+
+/*
   param userId: user id of the signed-in user
   param senderId: user id of the sender whose friend request is being accepted
   */

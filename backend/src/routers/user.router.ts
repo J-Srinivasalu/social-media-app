@@ -27,10 +27,6 @@ userRouter.post(
   }
 );
 
-userRouter.post("/friend", authenticate, (req: Request, res: Response) => {
-  updateUserController(req, res);
-});
-
 userRouter.post("/fcm", authenticate, (req: Request, res: Response) => {
   setFcmTokenController(req, res);
 });

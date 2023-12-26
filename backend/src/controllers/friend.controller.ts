@@ -10,8 +10,8 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
   deleteRespondedFriendRequests,
+  sendUnfriendRequest,
 } from "../services/friend.service";
-import { sendNotificationToSingleUser } from "../services/firebase.service";
 
 const sendFriendRequestSchema = z.object({
   receiverId: z.string(),
@@ -36,6 +36,32 @@ export async function sendFriendRequestController(req: Request, res: Response) {
     await sendFriendRequest(userId, receiverId);
     const apiResponse: ApiResponse = new ApiResponse(
       "Friend request sent Successfully"
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+export async function unfriendRequestController(req: Request, res: Response) {
+  try {
+    const parsedRequest = sendFriendRequestSchema.safeParse(req.body);
+
+    if (!parsedRequest.success) {
+      const errorMessage = fromZodError(parsedRequest.error).message.replace(
+        /"/g,
+        "'"
+      );
+      throw new ApiError(400, "Bad Request", errorMessage);
+    }
+
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    const { receiverId } = parsedRequest.data;
+
+    await sendUnfriendRequest(userId, receiverId);
+    const apiResponse: ApiResponse = new ApiResponse(
+      "Friend removed Successfully"
     );
     res.status(200).json(apiResponse);
   } catch (error) {
