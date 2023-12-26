@@ -11,7 +11,7 @@ export async function sendFriendRequest(userId: string, recieverId: string) {
   const reciever = await checkIfUserExistThenReturnUser(recieverId);
 
   const existingRequest = user.friendRequestSent.find(
-    (request) => request.userId?.toString() === reciever._id.toString()
+    (request) => request.user?.toString() === reciever._id.toString()
   );
 
   if (existingRequest) {
@@ -19,13 +19,13 @@ export async function sendFriendRequest(userId: string, recieverId: string) {
   }
 
   reciever.friendRequestReceived.push({
-    userId: user._id,
+    user: user._id,
     status: "pending",
   });
   await reciever.save();
 
   user.friendRequestSent.push({
-    userId: reciever._id,
+    user: reciever._id,
     status: "pending",
   });
   await user.save();
@@ -78,7 +78,7 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
   const sender = await checkIfUserExistThenReturnUser(senderId);
 
   const friendRequest = user.friendRequestReceived.find(
-    (request) => request.userId?.toString() == user.id
+    (request) => request.user?.toString() == user.id
   );
 
   if (!friendRequest) {
@@ -88,7 +88,7 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
   }
 
   const sendersFriendRequest = sender.friendRequestSent.find(
-    (request) => request.userId?.toString() == user.id
+    (request) => request.user?.toString() == user.id
   );
 
   if (!sendersFriendRequest) {
@@ -97,7 +97,7 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
 
   // Delete the friend request from user's friendRequestReceived array
   user.friendRequestReceived = user.friendRequestReceived.filter(
-    (request) => request.userId?.toString() !== sender._id.toString()
+    (request) => request.user?.toString() !== sender._id.toString()
   );
 
   sendersFriendRequest.status = "accepted";
@@ -127,7 +127,7 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
   const sender = await checkIfUserExistThenReturnUser(senderId);
 
   const friendRequest = await user.friendRequestReceived.find(
-    (request) => request.userId?.toString() == user.id
+    (request) => request.user?.toString() == user.id
   );
 
   if (!friendRequest) {
@@ -137,7 +137,7 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
   }
 
   const sendersFriendRequest = sender.friendRequestSent.find(
-    (request) => request.userId?.toString() == user.id
+    (request) => request.user?.toString() == user.id
   );
 
   if (!sendersFriendRequest) {
@@ -146,7 +146,7 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
 
   // Delete the friend request from user's friendRequestReceived array
   user.friendRequestReceived = user.friendRequestReceived.filter(
-    (request) => request.userId?.toString() !== sender._id.toString()
+    (request) => request.user?.toString() !== sender._id.toString()
   );
 
   sendersFriendRequest.status = "rejected";

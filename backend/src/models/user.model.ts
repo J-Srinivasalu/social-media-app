@@ -28,7 +28,7 @@ const userSchema = new Schema({
   },
   friendRequestSent: [
     {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       status: {
         type: String,
         enum: ["pending", "accepted", "rejected"],
@@ -38,7 +38,7 @@ const userSchema = new Schema({
   ],
   friendRequestReceived: [
     {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       status: {
         type: String,
         enum: ["pending", "accepted", "rejected"],
