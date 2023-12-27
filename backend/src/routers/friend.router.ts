@@ -14,7 +14,7 @@ friendRouter.post("/request", authenticate, (req: Request, res: Response) => {
   sendFriendRequestController(req, res);
 });
 
-friendRouter.post("/accepte", authenticate, (req: Request, res: Response) => {
+friendRouter.post("/accept", authenticate, (req: Request, res: Response) => {
   AcceptFriendRequestController(req, res);
 });
 

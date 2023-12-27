@@ -78,12 +78,12 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
   const sender = await checkIfUserExistThenReturnUser(senderId);
 
   const friendRequest = user.friendRequestReceived.find(
-    (request) => request.user?.toString() == user.id
+    (request) => request.user?.toString() == sender.id
   );
 
   if (!friendRequest) {
     throw new ApiError(404, "Not Found", "Friend request not found.");
-  } else if (friendRequest && friendRequest.status === "accepted") {
+  } else if (friendRequest.status === "accepted") {
     throw new ApiError(400, "Bad Request", "Friend request already accepted");
   }
 
@@ -126,13 +126,13 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
   const user = await checkIfUserExistThenReturnUser(userId);
   const sender = await checkIfUserExistThenReturnUser(senderId);
 
-  const friendRequest = await user.friendRequestReceived.find(
-    (request) => request.user?.toString() == user.id
+  const friendRequest = user.friendRequestReceived.find(
+    (request) => request.user?.toString() == sender.id
   );
 
   if (!friendRequest) {
     throw new ApiError(404, "Not Found", "Friend request not found.");
-  } else if (friendRequest && friendRequest.status === "rejected") {
+  } else if (friendRequest.status === "rejected") {
     throw new ApiError(400, "Bad Request", "Friend request already rejected");
   }
 
