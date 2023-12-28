@@ -4,6 +4,7 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import ApiError from "../utils/error.util";
 import { sendNotificationToSingleUser } from "../services/firebase.service";
+import { ApiResponse } from "../models/apiResponse.model";
 
 const notifyTestSchema = z.object({
   fcmToken: z.string(),
@@ -27,6 +28,7 @@ export async function notifyTestController(req: Request, res: Response) {
       "Test Notification",
       "This is a test notification"
     );
+    res.status(200).json(new ApiResponse("Notification sent successfully"));
   } catch (error) {
     handleApiError(res, error);
   }
