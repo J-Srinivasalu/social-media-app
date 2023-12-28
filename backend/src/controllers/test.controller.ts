@@ -26,7 +26,8 @@ export async function notifyTestController(req: Request, res: Response) {
     await sendNotificationToSingleUser(
       fcmToken,
       "Test Notification",
-      "This is a test notification"
+      "This is a test notification",
+      {}
     );
     res.status(200).json(new ApiResponse("Notification sent successfully"));
   } catch (error) {

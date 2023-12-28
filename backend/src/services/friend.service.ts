@@ -33,7 +33,11 @@ export async function sendFriendRequest(userId: string, recieverId: string) {
     sendNotificationToSingleUser(
       reciever.fcmToken,
       "Friend request",
-      `${user.fullName} wants to be your friend!`
+      `${user.fullName} wants to be your friend!`,
+      {
+        action: "friend_request",
+        id: user._id.toString(),
+      }
     );
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
@@ -62,7 +66,11 @@ export async function sendUnfriendRequest(userId: string, recieverId: string) {
     sendNotificationToSingleUser(
       reciever.fcmToken,
       "Unfriend request",
-      `${user.fullName} unfriended you`
+      `${user.fullName} unfriended you`,
+      {
+        action: "unfriend_request",
+        id: user._id.toString(),
+      }
     );
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
@@ -115,7 +123,11 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
     sendNotificationToSingleUser(
       sender.fcmToken,
       "Friend request",
-      `$You and ${user.fullName} are friend now!`
+      `$You and ${user.fullName} are friend now!`,
+      {
+        action: "accept_friend",
+        id: user._id.toString(),
+      }
     );
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
@@ -165,7 +177,11 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
     sendNotificationToSingleUser(
       sender.fcmToken,
       "Friend request",
-      `${user.fullName} rejected your requets`
+      `${user.fullName} rejected your requets`,
+      {
+        action: "reject_friend",
+        id: user._id.toString(),
+      }
     );
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
