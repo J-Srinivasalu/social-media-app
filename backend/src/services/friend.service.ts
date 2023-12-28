@@ -37,6 +37,9 @@ export async function sendFriendRequest(userId: string, recieverId: string) {
       {
         action: "friend_request",
         id: user._id.toString(),
+        fullName: user.fullName,
+        username: user.username,
+        profilePic: user.profilePic ?? "",
       }
     );
   } else {
@@ -70,6 +73,9 @@ export async function sendUnfriendRequest(userId: string, recieverId: string) {
       {
         action: "unfriend_request",
         id: user._id.toString(),
+        fullName: user.fullName,
+        username: user.username,
+        profilePic: user.profilePic ?? "",
       }
     );
   } else {
@@ -127,6 +133,9 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
       {
         action: "accept_friend",
         id: user._id.toString(),
+        fullName: user.fullName,
+        username: user.username,
+        profilePic: user.profilePic ?? "",
       }
     );
   } else {
@@ -181,6 +190,9 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
       {
         action: "reject_friend",
         id: user._id.toString(),
+        fullName: user.fullName,
+        username: user.username,
+        profilePic: user.profilePic ?? "",
       }
     );
   } else {
