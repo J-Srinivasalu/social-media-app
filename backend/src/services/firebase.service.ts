@@ -22,6 +22,12 @@ export async function sendNotificationToSingleUser(
     token: recipientToken,
   };
 
+  if (recipientToken == "") {
+    console.error("Invalid recipient token");
+    return;
+  }
+  console.log(`Recipient token : ${recipientToken}`);
+
   try {
     await messaging.send(message);
     console.log("Notification sent successfully");

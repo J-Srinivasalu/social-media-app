@@ -9,7 +9,6 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   rejectFriendRequest,
-  deleteRespondedFriendRequests,
   sendUnfriendRequest,
 } from "../services/friend.service";
 
@@ -126,24 +125,6 @@ export async function rejectFriendRequestController(
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Friend request rejected Successfully"
-    );
-    res.status(200).json(apiResponse);
-  } catch (error) {
-    handleApiError(res, error);
-  }
-}
-
-export async function deleteRespondedFriendRequestsController(
-  req: Request,
-  res: Response
-) {
-  try {
-    const userId = (req as AuthenticatedRequest).user.id;
-
-    await deleteRespondedFriendRequests(userId);
-
-    const apiResponse: ApiResponse = new ApiResponse(
-      "Friend request accepted Successfully"
     );
     res.status(200).json(apiResponse);
   } catch (error) {

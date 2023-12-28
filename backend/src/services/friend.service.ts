@@ -100,6 +100,10 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
     (request) => request.user?.toString() !== sender._id.toString()
   );
 
+  sender.friendRequestSent = sender.friendRequestSent.filter(
+    (request) => request.user?.toString() !== user._id.toString()
+  );
+
   sendersFriendRequest.status = "accepted";
 
   user.friends.push(sender._id);
@@ -149,6 +153,10 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
     (request) => request.user?.toString() !== sender._id.toString()
   );
 
+  sender.friendRequestSent = sender.friendRequestSent.filter(
+    (request) => request.user?.toString() !== user._id.toString()
+  );
+
   sendersFriendRequest.status = "rejected";
 
   await user.save();
@@ -162,14 +170,4 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
   }
-}
-
-export async function deleteRespondedFriendRequests(userId: string) {
-  const user = await checkIfUserExistThenReturnUser(userId);
-  // Delete the friend request from user's friendRequestReceived array
-  user.friendRequestSent = user.friendRequestSent.filter(
-    (request) => request.status === "pending"
-  );
-
-  await user.save();
 }

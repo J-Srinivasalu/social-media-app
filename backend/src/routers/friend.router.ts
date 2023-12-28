@@ -2,7 +2,6 @@ import { Request, Response, Router } from "express";
 import { authenticate } from "../middlewares/auth.middleware";
 import {
   AcceptFriendRequestController,
-  deleteRespondedFriendRequestsController,
   rejectFriendRequestController,
   sendFriendRequestController,
   unfriendRequestController,
@@ -25,13 +24,5 @@ friendRouter.post("/reject", authenticate, (req: Request, res: Response) => {
 friendRouter.post("/unfriend", authenticate, (req: Request, res: Response) => {
   unfriendRequestController(req, res);
 });
-
-friendRouter.post(
-  "/request/seen",
-  authenticate,
-  (req: Request, res: Response) => {
-    deleteRespondedFriendRequestsController(req, res);
-  }
-);
 
 export default friendRouter;
