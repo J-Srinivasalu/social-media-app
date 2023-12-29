@@ -13,6 +13,7 @@ import { fromZodError } from "zod-validation-error";
 import ApiError from "../utils/error.util";
 import { PublicProfile } from "../models/publicProfile.model";
 import { uploadOnCloudinary } from "../services/cloudinary.service";
+import { IUser } from "../models/user.model";
 
 export async function getUserController(req: Request, res: Response) {
   try {
@@ -74,7 +75,7 @@ export async function updateUserController(req: Request, res: Response) {
       profilePic = await uploadOnCloudinary(localFilePath);
     }
 
-    const user: PublicProfile = await updateUser(userId, fullName, profilePic);
+    const user: IUser = await updateUser(userId, fullName, profilePic);
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Updated User Details Successfully",
