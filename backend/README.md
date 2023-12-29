@@ -54,7 +54,6 @@ This component is responsible for handling server-side logic and data storage.
 14. **unfriend request:** Endpoint to send unfriend request.
 15. **accept friend request:** Endpoint to accept friend request.
 16. **reject friend request:** Endpoint to reject friend request.
-17. **delete friend request:** Endpoint to delete friend request once seen.
 
 ## Postman Collection Setup
 

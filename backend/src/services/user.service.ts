@@ -51,14 +51,7 @@ export async function updateUser(
   user.save();
   console.log(user);
 
-  const publicProfile = new PublicProfile(
-    user._id,
-    user.fullName,
-    user.username,
-    user.profilePic
-  );
-
-  return publicProfile;
+  return user;
 }
 
 export async function setFcmToken(
