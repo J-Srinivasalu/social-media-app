@@ -16,8 +16,7 @@ export async function getUser(id: string) {
       path: "friends",
       select: "_id fullName username profilePic",
     })
-    .select("-email -password")
-    .exec();
+    .select("-email -password");
   if (!user) {
     throw new ApiError(404, "Not Found", "User not found");
   }

@@ -21,9 +21,10 @@ export async function createComment(
     content: comment,
   });
 
-  const populatedComment = await Comment.findById(newComment._id)
-    .populate({ path: "user", select: "_id fullName username profilePic" })
-    .exec();
+  const populatedComment = await Comment.findById(newComment._id).populate({
+    path: "user",
+    select: "_id fullName username profilePic",
+  });
 
   //update comment count in post
   post.comments = post.comments == null ? 0 : post.comments + 1;
