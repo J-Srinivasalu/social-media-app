@@ -1,37 +1,40 @@
-import { Types } from "mongoose";
-import { io } from "..";
-import Conversation from "../models/conversation.model";
+import Chat, { IChat } from "../models/chat.model";
 import ApiError from "../utils/error.util";
 import { checkIfUserExistThenReturnUser } from "./user.service";
-import Message, { IMessage } from "../models/message.model";
+import ChatMessage, { IChatMessage } from "../models/message.model";
 import { MessageStatus } from "../utils/constant";
 import { sendNotificationToSingleUser } from "./firebase.service";
 
 export async function sendMessage(
   senderId: string,
-  message: string,
-  conversationId?: string
+  content: string,
+  chatId: string,
+  callback: (receiverId: string, newMessage: IChatMessage) => void
 ) {
   const user = await checkIfUserExistThenReturnUser(senderId);
-  let conversation = await Conversation.findById(conversationId);
+  let chat = await Chat.findById(chatId);
 
-  if (!conversation) {
-    throw new ApiError(404, "Not Found", "Conversation not found");
+  if (!chat) {
+    throw new ApiError(404, "Not Found", "Chat not found");
   }
 
-  const [receiverId] = conversation.participants.filter(
-    (userId) => userId != user._id
-  );
+  const [receiverId] = chat.participants.filter((userId) => userId != user._id);
   const receiver = await checkIfUserExistThenReturnUser(receiverId.toString());
 
-  const newMessage = await Message.create({
-    conversationId: conversation._id,
+  const newMessage = await ChatMessage.create({
+    chatId: chat._id,
     sender: user._id,
-    content: message,
+    content: content,
     status: MessageStatus.Sent,
   });
 
-  newMessage.save();
+  const popluatedMessage = await ChatMessage.findById(newMessage._id).populate({
+    path: "sender",
+    select: "_id fullName username profilePic",
+  });
+
+  chat.lastMessage = newMessage._id;
+  chat.save();
 
   if (receiver.fcmToken) {
     sendNotificationToSingleUser(
@@ -40,7 +43,7 @@ export async function sendMessage(
       newMessage.content,
       {
         action: "message",
-        conversationId: conversation._id.toString(),
+        conversationId: chat._id.toString(),
         id: user._id.toString(),
         fullName: user.fullName,
         username: user.username,
@@ -50,88 +53,137 @@ export async function sendMessage(
     );
   }
 
-  io.to(conversation._id.toString()).emit("new_message", newMessage);
+  callback(receiver._id.toString(), popluatedMessage!!);
+  return popluatedMessage;
 }
 
-export async function createConversation(
+export async function createChat(
   senderId: string,
   receiverId: string,
-  message: string
+  callback: (receiverId: string, newChat: IChat) => void
 ) {
   const user = await checkIfUserExistThenReturnUser(senderId);
   const receiver = await checkIfUserExistThenReturnUser(receiverId);
-  let conversation = await Conversation.findOne({
-    participants: { $all: [user._id, receiver._id] },
-  });
-  if (conversation) {
+
+  if (receiver._id.toString() == user._id.toString()) {
     throw new ApiError(
       400,
       "Bad Request",
-      "Conversation Already exist, Please send via existing conversation."
+      "You cannot chat with yourself (for now!)"
     );
   }
-  conversation = await Conversation.create({
+  const chat = await Chat.findOne({
+    participants: { $all: [user._id, receiver._id] },
+  })
+    .populate({
+      path: "perticipants",
+      select: "_id fullName username profilePic",
+    })
+    .populate({
+      path: "lastMessage",
+      select: "_id sender content status",
+    });
+
+  if (chat) {
+    return chat;
+  }
+  const newChat = await Chat.create({
     participants: [user._id, receiver._id],
   });
 
-  await sendMessage(user._id.toString(), message, conversation._id.toString());
+  const populatedChat = await Chat.findById(newChat._id).populate({
+    path: "perticipants",
+    select: "_id fullName username profilePic",
+  });
+
+  callback(receiver._id.toString(), populatedChat!!);
+
+  return populatedChat;
 }
 
-export async function updateMessageStatus(messageId: string, status: string) {
-  const updatedMessage = await Message.findByIdAndUpdate(
-    messageId,
-    { $set: { status: status } },
-    { new: true }
-  );
-  const conversationId = updatedMessage?.conversationId;
-  if (conversationId) {
-    io.to(conversationId.toString()).emit("messageStatusUpdated", {
+export async function updateMessageStatus(
+  messageId: string,
+  status: string,
+  callback: (senderId: string, updateMessage: IChatMessage) => void
+) {
+  try {
+    const updatedMessage = await ChatMessage.findByIdAndUpdate(
       messageId,
-      status,
+      { $set: { status: status } },
+      { new: true }
+    ).populate({
+      path: "sender",
+      select: "_id fullName username profilePic",
     });
-  } else {
-    console.log("conversation id was null");
+
+    const chatId = updatedMessage?.chat;
+    if (chatId) {
+      callback(updatedMessage.sender.toString(), updatedMessage);
+    } else {
+      console.log("conversation id was null");
+    }
+  } catch (error: any) {
+    console.log(
+      error?.message ?? "Something went wrong while updating message status"
+    );
   }
 }
 
-export async function getConversationsByUser(
+export async function updateAllMessagesInChatToRead(
+  chatId: string,
+  callback: (senderId: string, updateMessage: IChatMessage) => void
+) {
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    console.log("updateAllMessagesInChatToRead failed: chat not found");
+    return;
+  }
+
+  const messages = await ChatMessage.find({ chatId: chat._id });
+  messages.forEach((message) => {
+    updateMessageStatus(message._id.toString(), MessageStatus.Read, callback);
+  });
+}
+
+export async function getChatsByUser(
   userId: string,
   offset: number,
   limit: number
 ) {
-  const conversations = await Conversation.find({ participants: userId })
+  const chats = await Chat.find({ participants: userId })
     .sort({ updateAt: -1 })
     .skip(offset)
     .limit(limit)
     .populate({
       path: "perticipants",
       select: "_id fullName username profilePic",
+    })
+    .populate({
+      path: "lastMessage",
+      select: "_id sender content status",
     });
 
-  const messagesByConversation = await Promise.all(
-    conversations.map(async (conversation) => {
-      const conversationId = conversation._id.toString();
-      const recentMessages = await getMessagesForConversation(
-        conversationId,
-        0,
-        20
-      );
-      return { conversation, recentMessages };
-    })
-  );
-
-  return messagesByConversation;
+  return chats;
 }
 
-export async function getMessagesForConversation(
-  conversationId: string,
+export async function getMessagesForChat(
+  chatId: string,
   offset: number,
   limit: number
-): Promise<IMessage[]> {
-  const messages = await Message.find({ conversationId: conversationId })
+) {
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    throw new ApiError(404, "Not Found", "Chat not found");
+  }
+
+  const messages = await ChatMessage.find({ chat: chat._id })
     .sort({ createdAt: -1 })
     .skip(offset)
-    .limit(limit);
+    .limit(limit)
+    .populate({
+      path: "sender",
+      select: "_id fullName username profilePic",
+    });
 
   return messages;
 }

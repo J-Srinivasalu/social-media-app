@@ -1,10 +1,10 @@
 import { Router, Request, Response } from "express";
 import { authenticate } from "../middlewares/auth.middleware";
 import {
-  getConversationsController,
-  getMessagesForConversationController,
+  getChatsController,
+  getMessagesForChat,
   sendMessageController,
-  startConversationController,
+  createOrGetChatController,
   updateStatusController,
 } from "../controllers/chat.controller";
 
@@ -19,7 +19,7 @@ chatRouter.post(
   "/conversation",
   authenticate,
   (req: Request, res: Response) => {
-    startConversationController(req, res);
+    createOrGetChatController(req, res);
   }
 );
 
@@ -32,11 +32,11 @@ chatRouter.post(
 );
 
 chatRouter.get("/conversation", authenticate, (req: Request, res: Response) => {
-  getConversationsController(req, res);
+  getChatsController(req, res);
 });
 
 chatRouter.get("/message", authenticate, (req: Request, res: Response) => {
-  getMessagesForConversationController(req, res);
+  getMessagesForChat(req, res);
 });
 
 export default chatRouter;

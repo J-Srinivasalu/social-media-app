@@ -1,7 +1,7 @@
 import { Document, Schema, model, InferSchemaType, Types } from "mongoose";
 import { MessageStatus } from "../utils/constant";
 
-const conversationSchema = new Schema(
+const chatSchema = new Schema(
   {
     participants: [
       {
@@ -15,20 +15,22 @@ const conversationSchema = new Schema(
         required: true,
       },
     ],
+    lastMessage: {
+      type: Schema.Types.ObjectId,
+      ref: "ChatMessage",
+    },
   },
   {
     timestamps: true,
   }
 );
 
-conversationSchema.index({ updatedAt: -1 });
+chatSchema.index({ updatedAt: -1 });
 
-export interface IConversation
-  extends InferSchemaType<typeof conversationSchema>,
-    Document {
+export interface IChat extends InferSchemaType<typeof chatSchema>, Document {
   _id: Types.ObjectId;
 }
 
-const Conversation = model<IConversation>("Conversation", conversationSchema);
+const Chat = model<IChat>("Chat", chatSchema);
 
-export default Conversation;
+export default Chat;

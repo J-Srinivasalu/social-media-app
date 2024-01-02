@@ -6,15 +6,7 @@ import jwt, {
   NotBeforeError,
   TokenExpiredError,
 } from "jsonwebtoken";
-
-interface DecodedToken extends JwtPayload {
-  id: string;
-  email: string;
-}
-
-export interface AuthenticatedRequest extends Request {
-  user: DecodedToken;
-}
+import { AuthenticatedRequest, DecodedToken } from "../utils/types.util";
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {

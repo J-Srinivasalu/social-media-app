@@ -11,8 +11,8 @@ import {
   likePost,
 } from "../services/post.service";
 import { ApiResponse } from "../models/apiResponse.model";
-import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { IPost } from "../models/post.model";
+import { AuthenticatedRequest } from "../utils/types.util";
 
 const uploadPostSchema = z.object({
   content: z.string(),

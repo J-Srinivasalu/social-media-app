@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import config from "./config/config";
 import cors from "cors";
 import authRouter from "./routers/auth.router";
@@ -11,11 +12,26 @@ import friendRouter from "./routers/friend.router";
 import testRouter from "./routers/test.router";
 import chatRouter from "./routers/chat.router";
 import { Server } from "socket.io";
+import { initializeSocketIO } from "./socket/socket";
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: config.corsOrigin,
+    credentials: true,
+  },
+});
+
+app.set("io", io);
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+  })
+);
 
 app.use("/auth", authRouter);
 app.use("/post", postRouter);
@@ -26,12 +42,12 @@ app.use("/friend", friendRouter);
 app.use("/chat", chatRouter);
 app.use("/test", testRouter);
 
-export const io = new Server();
+initializeSocketIO(io);
 
 const PORT = config.port;
 
 connectDb().then(() => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server started at ${PORT}`);
   });
 });

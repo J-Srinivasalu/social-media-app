@@ -9,6 +9,7 @@ const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_SECRET_KEY = process.env.CLOUDINARY_SECRET_KEY;
 const FIREBASE_SERVICE_ACCOUNT_FILE = process.env.FIREBASE_SERVICE_ACCOUNT_FILE;
+const CORS_ORIGIN = process.env.CORS_ORIGIN ?? "*";
 
 if (
   !MONGO_DB_URL ||
@@ -36,6 +37,7 @@ const config = {
   cloudinaryApiKey: CLOUDINARY_API_KEY,
   cloudinarySecretKey: CLOUDINARY_SECRET_KEY,
   firebaseServiceFilePath: FIREBASE_SERVICE_ACCOUNT_FILE,
+  corsOrigin: CORS_ORIGIN,
 };
 
 export default config;

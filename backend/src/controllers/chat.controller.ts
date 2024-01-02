@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import handleApiError from "../utils/apiErrorHandler";
 import { ApiResponse } from "../models/apiResponse.model";
 import { z } from "zod";
@@ -7,15 +6,18 @@ import { fromZodError } from "zod-validation-error";
 import ApiError from "../utils/error.util";
 import {
   sendMessage,
-  createConversation,
+  createChat,
   updateMessageStatus,
-  getConversationsByUser,
-  getMessagesForConversation,
+  getChatsByUser,
+  getMessagesForChat,
 } from "../services/chat.service";
+import { AuthenticatedRequest } from "../utils/types.util";
+import { emitSocketEvent } from "../socket/socket";
+import { ChatEventEnum } from "../utils/constant";
 
 const sendMessageSchema = z.object({
-  message: z.string(),
-  conversationId: z.string().optional(),
+  content: z.string(),
+  chatId: z.string(),
 });
 
 export async function sendMessageController(req: Request, res: Response) {
@@ -31,8 +33,15 @@ export async function sendMessageController(req: Request, res: Response) {
       throw new ApiError(400, "Bad Request", errorMessage);
     }
 
-    const { message, conversationId } = parsedRequest.data;
-    await sendMessage(userId, message, conversationId);
+    const { content, chatId } = parsedRequest.data;
+    await sendMessage(userId, content, chatId, (receiverId, newMessage) => {
+      emitSocketEvent(
+        req,
+        receiverId,
+        ChatEventEnum.NEW_CHAT_EVENT,
+        newMessage
+      );
+    });
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Message Sent Successfully"
@@ -43,16 +52,15 @@ export async function sendMessageController(req: Request, res: Response) {
   }
 }
 
-const startConversationSchema = z.object({
+const createOrGetChatSchema = z.object({
   receiverId: z.string(),
-  message: z.string(),
 });
 
-export async function startConversationController(req: Request, res: Response) {
+export async function createOrGetChatController(req: Request, res: Response) {
   try {
     const userId = (req as AuthenticatedRequest).user.id;
 
-    const parsedRequest = startConversationSchema.safeParse(req.body);
+    const parsedRequest = createOrGetChatSchema.safeParse(req.body);
     if (!parsedRequest.success) {
       const errorMessage = fromZodError(parsedRequest.error).message.replace(
         /"/g,
@@ -61,11 +69,16 @@ export async function startConversationController(req: Request, res: Response) {
       throw new ApiError(400, "Bad Request", errorMessage);
     }
 
-    const { receiverId, message } = parsedRequest.data;
-    await createConversation(userId, receiverId, message);
+    const { receiverId } = parsedRequest.data;
+    const chat = await createChat(userId, receiverId, (receiverId, newChat) => {
+      emitSocketEvent(req, receiverId, ChatEventEnum.NEW_CHAT_EVENT, newChat);
+    });
 
     const apiResponse: ApiResponse = new ApiResponse(
-      "Message Sent Successfully"
+      "Chat retrieved successfully",
+      {
+        chat: chat,
+      }
     );
     res.status(201).json(apiResponse);
   } catch (error) {
@@ -73,52 +86,18 @@ export async function startConversationController(req: Request, res: Response) {
   }
 }
 
-const updateStatusSchema = z.object({
-  messageId: z.string(),
-  status: z.string(),
-});
-
-export async function updateStatusController(req: Request, res: Response) {
-  try {
-    const userId = (req as AuthenticatedRequest).user.id;
-
-    const parsedRequest = updateStatusSchema.safeParse(req.body);
-    if (!parsedRequest.success) {
-      const errorMessage = fromZodError(parsedRequest.error).message.replace(
-        /"/g,
-        "'"
-      );
-      throw new ApiError(400, "Bad Request", errorMessage);
-    }
-
-    const { messageId, status } = parsedRequest.data;
-    await updateMessageStatus(messageId, status);
-
-    const apiResponse: ApiResponse = new ApiResponse(
-      "Message status updated Successfully"
-    );
-    res.status(200).json(apiResponse);
-  } catch (error) {
-    handleApiError(res, error);
-  }
-}
-
-export async function getConversationsController(req: Request, res: Response) {
+export async function getChatsController(req: Request, res: Response) {
   try {
     const userId = (req as AuthenticatedRequest).user.id;
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = parseInt(req.query.limit as string) || 10;
 
-    const conversationsWithRecentMessages = await getConversationsByUser(
-      userId,
-      offset,
-      limit
-    );
+    const chats = await getChatsByUser(userId, offset, limit);
 
     const apiResponse: ApiResponse = new ApiResponse(
-      "Conversations fetched Successfully",
+      "Chats fetched Successfully",
       {
-        conversations: conversationsWithRecentMessages,
+        chats: chats,
       }
     );
     res.status(200).json(apiResponse);
@@ -127,20 +106,16 @@ export async function getConversationsController(req: Request, res: Response) {
   }
 }
 
-export async function getMessagesForConversationController(
+export async function getMessagesForChatController(
   req: Request,
   res: Response
 ) {
   try {
-    const conversationId = req.query.conversationId as string;
+    const chatId = req.query.chatId as string;
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = parseInt(req.query.limit as string) || 10;
 
-    const messages = await getMessagesForConversation(
-      conversationId,
-      offset,
-      limit
-    );
+    const messages = await getMessagesForChat(chatId, offset, limit);
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Messages fetched Successfully",
