@@ -2,11 +2,7 @@ import { Server } from "socket.io";
 import ApiError from "../utils/error.util";
 import jwt from "jsonwebtoken";
 import { checkIfUserExistThenReturnUser } from "../services/user.service";
-import {
-  AuthenticatedRequest,
-  CustomSocket,
-  DecodedToken,
-} from "../utils/types.util";
+import { CustomSocket, DecodedToken } from "../utils/types.util";
 import { ChatEventEnum, MessageStatus } from "../utils/constant";
 import { Request } from "express";
 import {

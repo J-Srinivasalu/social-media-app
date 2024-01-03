@@ -14,6 +14,7 @@ import {
 import { AuthenticatedRequest } from "../utils/types.util";
 import { emitSocketEvent } from "../socket/socket";
 import { ChatEventEnum } from "../utils/constant";
+import { IChat } from "../models/chat.model";
 
 const sendMessageSchema = z.object({
   content: z.string(),
@@ -34,17 +35,25 @@ export async function sendMessageController(req: Request, res: Response) {
     }
 
     const { content, chatId } = parsedRequest.data;
-    await sendMessage(userId, content, chatId, (receiverId, newMessage) => {
-      emitSocketEvent(
-        req,
-        receiverId,
-        ChatEventEnum.NEW_CHAT_EVENT,
-        newMessage
-      );
-    });
+    const newMessage = await sendMessage(
+      userId,
+      content,
+      chatId,
+      (receiverId, newMessage) => {
+        emitSocketEvent(
+          req,
+          receiverId,
+          ChatEventEnum.MESSAGE_RECEIVED_EVENT,
+          newMessage
+        );
+      }
+    );
 
     const apiResponse: ApiResponse = new ApiResponse(
-      "Message Sent Successfully"
+      "Message Sent Successfully",
+      {
+        message: newMessage,
+      }
     );
     res.status(201).json(apiResponse);
   } catch (error) {
@@ -70,9 +79,13 @@ export async function createOrGetChatController(req: Request, res: Response) {
     }
 
     const { receiverId } = parsedRequest.data;
-    const chat = await createChat(userId, receiverId, (receiverId, newChat) => {
-      emitSocketEvent(req, receiverId, ChatEventEnum.NEW_CHAT_EVENT, newChat);
-    });
+    const [statusCode, chat]: [number, IChat] = await createChat(
+      userId,
+      receiverId,
+      (receiverId, newChat) => {
+        emitSocketEvent(req, receiverId, ChatEventEnum.NEW_CHAT_EVENT, newChat);
+      }
+    );
 
     const apiResponse: ApiResponse = new ApiResponse(
       "Chat retrieved successfully",
@@ -80,7 +93,7 @@ export async function createOrGetChatController(req: Request, res: Response) {
         chat: chat,
       }
     );
-    res.status(201).json(apiResponse);
+    res.status(statusCode).json(apiResponse);
   } catch (error) {
     handleApiError(res, error);
   }
