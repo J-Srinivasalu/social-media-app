@@ -61,7 +61,7 @@ export async function createChat(
   senderId: string,
   receiverId: string,
   callback: (receiverId: string, newChat: IChat) => void
-): Promise<[number, IChat]> {
+): Promise<[boolean, IChat]> {
   const user = await checkIfUserExistThenReturnUser(senderId);
   const receiver = await checkIfUserExistThenReturnUser(receiverId);
 
@@ -85,7 +85,7 @@ export async function createChat(
     });
 
   if (chat) {
-    return [200, chat];
+    return [false, chat];
   }
   const newChat = await Chat.create({
     participants: [user._id, receiver._id],
@@ -98,7 +98,7 @@ export async function createChat(
 
   callback(receiver._id.toString(), populatedChat!!);
 
-  return [201, populatedChat!!];
+  return [true, populatedChat!!];
 }
 
 export async function updateMessageStatus(

@@ -1,5 +1,4 @@
 import { Document, Schema, model, InferSchemaType, Types } from "mongoose";
-import { MessageStatus } from "../utils/constant";
 
 const chatSchema = new Schema(
   {

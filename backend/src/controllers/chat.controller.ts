@@ -7,7 +7,6 @@ import ApiError from "../utils/error.util";
 import {
   sendMessage,
   createChat,
-  updateMessageStatus,
   getChatsByUser,
   getMessagesForChat,
 } from "../services/chat.service";
@@ -79,7 +78,7 @@ export async function createOrGetChatController(req: Request, res: Response) {
     }
 
     const { receiverId } = parsedRequest.data;
-    const [statusCode, chat]: [number, IChat] = await createChat(
+    const [isNew, chat]: [boolean, IChat] = await createChat(
       userId,
       receiverId,
       (receiverId, newChat) => {
@@ -93,7 +92,7 @@ export async function createOrGetChatController(req: Request, res: Response) {
         chat: chat,
       }
     );
-    res.status(statusCode).json(apiResponse);
+    res.status(isNew ? 201 : 200).json(apiResponse);
   } catch (error) {
     handleApiError(res, error);
   }
