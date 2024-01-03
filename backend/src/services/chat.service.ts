@@ -76,7 +76,7 @@ export async function createChat(
     participants: { $all: [user._id, receiver._id] },
   })
     .populate({
-      path: "perticipants",
+      path: "participants",
       select: "_id fullName username profilePic",
     })
     .populate({
@@ -92,7 +92,7 @@ export async function createChat(
   });
 
   const populatedChat = await Chat.findById(newChat._id).populate({
-    path: "perticipants",
+    path: "participants",
     select: "_id fullName username profilePic",
   });
 
@@ -155,7 +155,7 @@ export async function getChatsByUser(
     .skip(offset)
     .limit(limit)
     .populate({
-      path: "perticipants",
+      path: "participants",
       select: "_id fullName username profilePic",
     })
     .populate({
