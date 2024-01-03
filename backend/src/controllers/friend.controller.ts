@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import handleApiError from "../utils/apiErrorHandler";
-import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { AuthenticatedRequest } from "../utils/types.util";
 import { ApiResponse } from "../models/apiResponse.model";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";

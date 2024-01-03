@@ -1,11 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
-import jwt, {
-  JwtPayload,
-  NotBeforeError,
-  TokenExpiredError,
-} from "jsonwebtoken";
+import jwt, { NotBeforeError, TokenExpiredError } from "jsonwebtoken";
 import { AuthenticatedRequest, DecodedToken } from "../utils/types.util";
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {

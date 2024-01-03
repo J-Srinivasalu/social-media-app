@@ -4,13 +4,13 @@ import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
 import { fromZodError } from "zod-validation-error";
 import { ApiResponse } from "../models/apiResponse.model";
-import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import {
   createComment,
   getCommentsByPostId,
   likeComment,
 } from "../services/comment.service";
 import { IComment } from "../models/comment.model";
+import { AuthenticatedRequest } from "../utils/types.util";
 
 const uploadCommentSchema = z.object({
   postId: z.string(),
