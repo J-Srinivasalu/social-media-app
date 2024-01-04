@@ -12,9 +12,11 @@ import {
 
 export function initializeSocketIO(io: Server) {
   console.log("socket.io initialization started");
-  return io.on("connnection", async (socket: CustomSocket) => {
+  return io.on("connection", async (socket: CustomSocket) => {
     try {
+      console.log("connected");
       const token = socket.handshake.auth.token;
+      console.log(token);
       if (!token) {
         throw new ApiError(
           401,
@@ -27,6 +29,8 @@ export function initializeSocketIO(io: Server) {
         token,
         process.env.SECRET_KEY ?? ""
       ) as DecodedToken;
+
+      console.log(decoded);
 
       const user = await checkIfUserExistThenReturnUser(decoded.id);
 
@@ -78,6 +82,7 @@ export function initializeSocketIO(io: Server) {
         }
       });
     } catch (error: any) {
+      console.log(error);
       socket.emit(
         ChatEventEnum.SOCKET_ERROR_EVENT,
         error?.message || "Something went wrong while connecting to the socket."

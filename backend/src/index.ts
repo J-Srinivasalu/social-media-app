@@ -18,8 +18,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: config.corsOrigin,
-    credentials: true,
+    origin: "*",
   },
 });
 
@@ -28,8 +27,7 @@ app.set("io", io);
 app.use(express.json());
 app.use(
   cors({
-    origin: config.corsOrigin,
-    credentials: true,
+    origin: "*",
   })
 );
 
