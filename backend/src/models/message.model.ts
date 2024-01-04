@@ -5,7 +5,7 @@ const chatMessageSchema = new Schema(
   {
     chat: {
       type: Schema.Types.ObjectId,
-      ref: "Conversation",
+      ref: "Chat",
       required: true,
     },
     sender: {
