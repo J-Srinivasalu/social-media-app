@@ -82,6 +82,10 @@ export async function createChat(
     .populate({
       path: "lastMessage",
       select: "_id sender content status",
+    })
+    .populate({
+      path: "lastMessage.sender", // Populate the sender field
+      select: "_id fullName username profilePic",
     });
 
   if (chat) {
@@ -139,7 +143,7 @@ export async function updateAllMessagesInChatToRead(
     return;
   }
 
-  const messages = await ChatMessage.find({ chatId: chat._id });
+  const messages = await ChatMessage.find({ chat: chat._id });
   messages.forEach((message) => {
     updateMessageStatus(message._id.toString(), MessageStatus.Read, callback);
   });
@@ -161,6 +165,10 @@ export async function getChatsByUser(
     .populate({
       path: "lastMessage",
       select: "_id sender content status",
+    })
+    .populate({
+      path: "lastMessage.sender", // Populate the sender field
+      select: "_id fullName username profilePic",
     });
 
   return chats;
