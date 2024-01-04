@@ -11,6 +11,7 @@ import {
 } from "../services/chat.service";
 
 export function initializeSocketIO(io: Server) {
+  console.log("socket.io initialization started");
   return io.on("connnection", async (socket: CustomSocket) => {
     try {
       const token = socket.handshake.auth.token;

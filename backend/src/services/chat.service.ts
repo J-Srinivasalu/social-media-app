@@ -22,7 +22,7 @@ export async function sendMessage(
   const receiver = await checkIfUserExistThenReturnUser(receiverId.toString());
 
   const newMessage = await ChatMessage.create({
-    chatId: chat._id,
+    chat: chat._id,
     sender: user._id,
     content: content,
     status: MessageStatus.Sent,
