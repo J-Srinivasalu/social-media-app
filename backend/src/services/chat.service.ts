@@ -81,7 +81,6 @@ export async function createChat(
     })
     .populate({
       path: "lastMessage",
-      select: "_id sender content status",
     })
     .populate({
       path: "lastMessage.sender", // Populate the sender field
@@ -164,7 +163,6 @@ export async function getChatsByUser(
     })
     .populate({
       path: "lastMessage",
-      select: "_id sender content status",
     })
     .populate({
       path: "lastMessage.sender", // Populate the sender field
