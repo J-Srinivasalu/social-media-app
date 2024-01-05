@@ -48,14 +48,17 @@ export function initializeSocketIO(io: Server) {
       });
 
       socket.on(ChatEventEnum.TYPING_EVENT, (chatId) => {
+        console.log(`${ChatEventEnum.TYPING_EVENT} ${chatId}`);
         socket.in(chatId).emit(ChatEventEnum.TYPING_EVENT, chatId);
       });
 
       socket.on(ChatEventEnum.STOP_TYPING_EVENT, (chatId) => {
+        console.log(`${ChatEventEnum.STOP_TYPING_EVENT} ${chatId}`);
         socket.in(chatId).emit(ChatEventEnum.STOP_TYPING_EVENT, chatId);
       });
 
       socket.on(ChatEventEnum.MESSAGE_DELIVERED, (messageId) => {
+        console.log(`${ChatEventEnum.MESSAGE_DELIVERED} ${messageId}`);
         updateMessageStatus(
           messageId,
           MessageStatus.Delivered,
@@ -68,6 +71,7 @@ export function initializeSocketIO(io: Server) {
       });
 
       socket.on(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, (chatId) => {
+        console.log(`${ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT} ${chatId}`);
         updateAllMessagesInChatToRead(chatId, (senderId, updatedMessage) => {
           socket
             .in(senderId)
@@ -82,6 +86,7 @@ export function initializeSocketIO(io: Server) {
         }
       });
     } catch (error: any) {
+      console.log(`Error occured`);
       console.log(error);
       socket.emit(
         ChatEventEnum.SOCKET_ERROR_EVENT,
@@ -97,5 +102,8 @@ export function emitSocketEvent(
   event: string,
   payload: any
 ) {
+  console.log(
+    `emit socket event ${roomId} ${event} ${JSON.stringify(payload)}`
+  );
   req.app.get("io").in(roomId).emit(event, payload);
 }

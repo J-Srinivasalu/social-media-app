@@ -39,6 +39,11 @@ export async function sendMessageController(req: Request, res: Response) {
       content,
       chatId,
       (receiverId, newMessage) => {
+        console.log(
+          `${ChatEventEnum.NEW_CHAT_EVENT} ${receiverId} - ${JSON.stringify(
+            newMessage
+          )}`
+        );
         emitSocketEvent(
           req,
           receiverId,
@@ -82,6 +87,11 @@ export async function createOrGetChatController(req: Request, res: Response) {
       userId,
       receiverId,
       (receiverId, newChat) => {
+        console.log(
+          `${ChatEventEnum.NEW_CHAT_EVENT} ${receiverId} - ${JSON.stringify(
+            newChat
+          )}`
+        );
         emitSocketEvent(req, receiverId, ChatEventEnum.NEW_CHAT_EVENT, newChat);
       }
     );
