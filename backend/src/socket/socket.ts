@@ -73,8 +73,11 @@ export function initializeSocketIO(io: Server) {
       socket.on(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, (chatId) => {
         console.log(`${ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT} ${chatId}`);
         updateAllMessagesInChatToRead(chatId, (senderId, messageId) => {
+          console.log(
+            `EMIT ${ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT} ${chatId}`
+          );
           socket
-            .in(senderId)
+            .in(chatId)
             .emit(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, messageId);
         });
       });
