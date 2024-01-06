@@ -21,7 +21,11 @@ export async function sendMessage(
   // this line doesn't work : can someone explain why?
   // it always return same person no matter who sends the message.
   // const [receiverId] = chat.participants.filter((userId) => userId != user._id);
-  const receiverId = chat.participants.find((userId) => userId !== user._id);
+  console.log("senderId: ", user._id);
+  console.log("participents: ", JSON.stringify(chat.participants));
+  const receiverId = chat.participants.find(
+    (userId) => userId.toString() !== user._id.toString()
+  );
   const receiver = await checkIfUserExistThenReturnUser(receiverId?.toString());
   console.log(`receiver: ${JSON.stringify(receiver)}`);
 
