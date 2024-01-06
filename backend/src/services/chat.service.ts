@@ -115,7 +115,7 @@ export async function createChat(
 export async function updateMessageStatus(
   messageId: string,
   status: string,
-  callback: (senderId: string, updateMessage: IChatMessage) => void
+  callback: (senderId: string, messageId: string) => void
 ) {
   try {
     const updatedMessage = await ChatMessage.findByIdAndUpdate(
@@ -129,7 +129,7 @@ export async function updateMessageStatus(
 
     const chatId = updatedMessage?.chat;
     if (chatId) {
-      callback(updatedMessage.sender.toString(), updatedMessage);
+      callback(updatedMessage.sender.toString(), updatedMessage._id.toString());
     } else {
       console.log("conversation id was null");
     }
@@ -142,7 +142,7 @@ export async function updateMessageStatus(
 
 export async function updateAllMessagesInChatToRead(
   chatId: string,
-  callback: (senderId: string, updateMessage: IChatMessage) => void
+  callback: (senderId: string, messageId: string) => void
 ) {
   const chat = await Chat.findById(chatId);
   if (!chat) {
