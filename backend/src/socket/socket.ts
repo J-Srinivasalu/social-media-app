@@ -76,10 +76,8 @@ export function initializeSocketIO(io: Server) {
           console.log(
             `EMIT ${ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT} ${chatId}`
           );
-          socket
-            .in(chatId)
-            .emit(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, messageId);
         });
+        socket.in(chatId).emit(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, chatId);
       });
 
       socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
