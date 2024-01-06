@@ -64,7 +64,7 @@ export async function setFcmToken(
   user.save();
 }
 
-export async function checkIfUserExistThenReturnUser(userId: string) {
+export async function checkIfUserExistThenReturnUser(userId?: string) {
   const user = await User.findById(userId);
   if (!user) {
     throw new ApiError(404, "Not Found", "User not found");

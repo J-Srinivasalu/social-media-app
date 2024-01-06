@@ -18,8 +18,12 @@ export async function sendMessage(
     throw new ApiError(404, "Not Found", "Chat not found");
   }
 
-  const [receiverId] = chat.participants.filter((userId) => userId != user._id);
-  const receiver = await checkIfUserExistThenReturnUser(receiverId.toString());
+  // this line doesn't work : can someone explain why?
+  // it always return same person no matter who sends the message.
+  // const [receiverId] = chat.participants.filter((userId) => userId != user._id);
+  const receiverId = chat.participants.find((userId) => userId !== user._id);
+  const receiver = await checkIfUserExistThenReturnUser(receiverId?.toString());
+  console.log(`receiver: ${JSON.stringify(receiver)}`);
 
   const newMessage = await ChatMessage.create({
     chat: chat._id,

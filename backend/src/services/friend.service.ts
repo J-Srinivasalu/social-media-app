@@ -129,7 +129,7 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
     sendNotificationToSingleUser(
       sender.fcmToken,
       "Friend request",
-      `$You and ${user.fullName} are friend now!`,
+      `${user.fullName} is your friend now!`,
       {
         action: "accept_friend",
         id: user._id.toString(),

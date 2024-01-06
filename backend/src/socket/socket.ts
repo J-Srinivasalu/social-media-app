@@ -16,7 +16,7 @@ export function initializeSocketIO(io: Server) {
     try {
       console.log("connected");
       const token = socket.handshake.auth.token;
-      console.log(token);
+      console.log("handshake token: ", token);
       if (!token) {
         throw new ApiError(
           401,
