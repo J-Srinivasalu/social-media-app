@@ -81,7 +81,6 @@ export function initializeSocketIO(io: Server) {
 
       socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
         console.log("User disconnected, user id", socket.user?._id.toString());
-        socket.emit(ChatEventEnum.DISCONNECT_EVENT, user._id.toString());
         if (socket.user?._id) {
           socket.leave(socket.user._id.toString());
         }
