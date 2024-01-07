@@ -6,15 +6,15 @@ export async function getUser(id: string) {
   const user = await User.findById(id)
     .populate({
       path: "friendRequestSent.user",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     })
     .populate({
       path: "friendRequestReceived.user",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     })
     .populate({
       path: "friends",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     })
     .select("-email -password");
   if (!user) {

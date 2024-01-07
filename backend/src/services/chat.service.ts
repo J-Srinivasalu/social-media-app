@@ -38,7 +38,7 @@ export async function sendMessage(
 
   const popluatedMessage = await ChatMessage.findById(newMessage._id).populate({
     path: "sender",
-    select: "_id fullName username profilePic",
+    select: "_id fullName username profilePic isOnline isOnline",
   });
 
   chat.lastMessage = newMessage._id;
@@ -51,7 +51,7 @@ export async function sendMessage(
       newMessage.content,
       {
         action: "message",
-        conversationId: chat._id.toString(),
+        chatId: chat._id.toString(),
         id: user._id.toString(),
         fullName: user.fullName,
         username: user.username,
@@ -85,14 +85,14 @@ export async function createChat(
   })
     .populate({
       path: "participants",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     })
     .populate({
       path: "lastMessage",
     })
     .populate({
       path: "lastMessage.sender", // Populate the sender field
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     });
 
   if (chat) {
@@ -104,7 +104,7 @@ export async function createChat(
 
   const populatedChat = await Chat.findById(newChat._id).populate({
     path: "participants",
-    select: "_id fullName username profilePic",
+    select: "_id fullName username profilePic isOnline",
   });
 
   callback(receiver._id.toString(), populatedChat!!);
@@ -124,7 +124,7 @@ export async function updateMessageStatus(
       { new: true }
     ).populate({
       path: "sender",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     });
 
     const chatId = updatedMessage?.chat;
@@ -152,7 +152,7 @@ export async function updateAllMessagesInChatToRead(
 
   const messages = await ChatMessage.find({ chat: chat._id });
   messages.forEach((message) => {
-    updateMessageStatus(message._id.toString(), MessageStatus.Read, callback);
+    updateMessageStatus(message._id.toString(), MessageStatus.Seen, callback);
   });
 }
 
@@ -167,14 +167,14 @@ export async function getChatsByUser(
     .limit(limit)
     .populate({
       path: "participants",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     })
     .populate({
       path: "lastMessage",
     })
     .populate({
       path: "lastMessage.sender", // Populate the sender field
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     });
 
   return chats;
@@ -196,7 +196,7 @@ export async function getMessagesForChat(
     .limit(limit)
     .populate({
       path: "sender",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     });
 
   return messages;

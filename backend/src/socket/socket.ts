@@ -39,7 +39,10 @@ export function initializeSocketIO(io: Server) {
       //creating a room so if the user is not part of any chat, he can still receive new chats for the first time.
       socket.join(user._id.toString());
 
+      user.isOnline = true;
+      user.save();
       socket.emit(ChatEventEnum.CONNECTED_EVENT, user._id.toString());
+      socket.emit(ChatEventEnum.USER_ONLINE, user._id.toString());
       console.log("User connected, user id: ", user._id.toString());
 
       socket.on(ChatEventEnum.JOIN_CHAT_EVENT, (chatId) => {
@@ -82,6 +85,9 @@ export function initializeSocketIO(io: Server) {
 
       socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
         console.log("User disconnected, user id", socket.user?._id.toString());
+        user.isOnline = false;
+        user.save();
+        socket.emit(ChatEventEnum.USER_OFFLINE, user._id.toString());
         if (socket.user?._id) {
           socket.leave(socket.user._id.toString());
         }

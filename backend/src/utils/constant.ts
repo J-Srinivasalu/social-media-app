@@ -1,7 +1,7 @@
 export enum MessageStatus {
   Sent = "sent",
   Delivered = "delivered",
-  Read = "read",
+  Seen = "seen",
 }
 
 export const ChatEventEnum = Object.freeze({
@@ -25,6 +25,10 @@ export const ChatEventEnum = Object.freeze({
   CHAT_MESSAGES_SEEN_EVENT: "messagesSeen",
   // ? when user receives message notification
   MESSAGE_DELIVERED: "messageDelivered",
+  // ? when user goes offline
+  USER_OFFLINE: "userOffline",
+  // ? when user comes online
+  USER_ONLINE: "userOnline",
 });
 
 export const AvailableChatEvents = Object.values(ChatEventEnum);

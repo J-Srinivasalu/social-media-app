@@ -19,7 +19,7 @@ export async function createPost(
     // Query for the created post and populate the 'user' field
     const populatedPost = await Post.findById(post._id).populate({
       path: "user",
-      select: "_id fullName username profilePic",
+      select: "_id fullName username profilePic isOnline",
     });
 
     return populatedPost!!;
@@ -40,7 +40,7 @@ export async function getPosts(
       .limit(limit)
       .populate({
         path: "user",
-        select: "_id fullName username profilePic",
+        select: "_id fullName username profilePic isOnline",
       });
 
     return posts;
@@ -64,7 +64,7 @@ export async function getPostsByUserId(
       .limit(limit)
       .populate({
         path: "user",
-        select: "_id fullName username profilePic",
+        select: "_id fullName username profilePic isOnline",
       });
 
     return posts;
