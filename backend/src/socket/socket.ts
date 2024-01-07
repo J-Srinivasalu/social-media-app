@@ -42,6 +42,7 @@ export function initializeSocketIO(io: Server) {
       user.isOnline = true;
       user.save();
       socket.emit(ChatEventEnum.CONNECTED_EVENT, user._id.toString());
+      console.log("user offline", user._id.toString());
       socket.emit(ChatEventEnum.USER_ONLINE, user._id.toString());
       console.log("User connected, user id: ", user._id.toString());
 
@@ -87,6 +88,7 @@ export function initializeSocketIO(io: Server) {
         console.log("User disconnected, user id", socket.user?._id.toString());
         user.isOnline = false;
         user.save();
+        console.log("user offline", user._id.toString());
         socket.emit(ChatEventEnum.USER_OFFLINE, user._id.toString());
         if (socket.user?._id) {
           socket.leave(socket.user._id.toString());
