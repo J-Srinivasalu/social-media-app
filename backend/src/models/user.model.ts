@@ -1,55 +1,60 @@
 import mongoose, { InferSchemaType, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 
-const userSchema = new Schema({
-  fullName: {
-    type: String,
-    required: true,
-  },
-  username: {
-    type: String,
-    unique: true,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-  },
-  profilePic: {
-    type: String,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  friendRequestSent: [
-    {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      status: {
-        type: String,
-        enum: ["pending", "accepted", "rejected"],
-        default: "pending",
-      },
+const userSchema = new Schema(
+  {
+    fullName: {
+      type: String,
+      required: true,
     },
-  ],
-  friendRequestReceived: [
-    {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      status: {
-        type: String,
-        enum: ["pending", "accepted", "rejected"],
-        default: "pending",
-      },
+    username: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
     },
-  ],
-  friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  isOnline: { type: Boolean },
-  fcmToken: { type: String },
-});
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    profilePic: {
+      type: String,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    friendRequestSent: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        status: {
+          type: String,
+          enum: ["pending", "accepted", "rejected"],
+          default: "pending",
+        },
+      },
+    ],
+    friendRequestReceived: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        status: {
+          type: String,
+          enum: ["pending", "accepted", "rejected"],
+          default: "pending",
+        },
+      },
+    ],
+    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    isOnline: { type: Boolean },
+    fcmToken: { type: String },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export interface IUser extends InferSchemaType<typeof userSchema>, Document {
   _id: mongoose.Types.ObjectId;

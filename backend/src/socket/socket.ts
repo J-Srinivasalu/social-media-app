@@ -42,8 +42,26 @@ export function initializeSocketIO(io: Server) {
       user.isOnline = true;
       user.save();
       socket.emit(ChatEventEnum.CONNECTED_EVENT, user._id.toString());
-      console.log("user offline", user._id.toString());
-      socket.emit(ChatEventEnum.USER_ONLINE, user._id.toString());
+      console.log("user online", user._id.toString());
+      socket.emit(
+        ChatEventEnum.USER_ONLINE,
+        user._id.toString(),
+        (userId: String) => {
+          console.log("received: ", userId);
+        }
+      );
+      // send status to only friends
+      for (var friend in user.friends) {
+        socket
+          .in(friend.toString())
+          .emit(
+            ChatEventEnum.USER_ONLINE,
+            user._id.toString(),
+            (userId: String) => {
+              console.log("received: ", userId);
+            }
+          );
+      }
       console.log("User connected, user id: ", user._id.toString());
 
       socket.on(ChatEventEnum.JOIN_CHAT_EVENT, (chatId) => {
