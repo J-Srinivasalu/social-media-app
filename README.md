@@ -35,6 +35,9 @@ _yet to deploy the app_
 14. **unfriend request:** Endpoint to send unfriend request.
 15. **accept friend request:** Endpoint to accept friend request.
 16. **reject friend request:** Endpoint to reject friend request.
+17. **start chat:** Endpoint to start chat with a friend.
+18. **send message:** Endpoint to send a message in a chat.
+19. **get realtime feedback(typing, online, sent, seen):** using socket.io giving feedback to users in realtime.
 
 ### Frontend
 
