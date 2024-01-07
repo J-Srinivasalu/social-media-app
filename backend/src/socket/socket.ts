@@ -43,13 +43,7 @@ export function initializeSocketIO(io: Server) {
       user.save();
       socket.emit(ChatEventEnum.CONNECTED_EVENT, user._id.toString());
       console.log("user online", user._id.toString());
-      socket.broadcast.emit(
-        ChatEventEnum.USER_ONLINE,
-        user._id.toString(),
-        (userId: string) => {
-          console.log("received: ", userId);
-        }
-      );
+      socket.broadcast.emit(ChatEventEnum.USER_ONLINE, user._id.toString());
       socket.onAnyOutgoing((event) => {
         console.log("onAnyOutgoing: Event sent: ", event);
       });
