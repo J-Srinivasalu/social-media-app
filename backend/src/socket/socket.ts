@@ -46,22 +46,24 @@ export function initializeSocketIO(io: Server) {
       socket.emit(
         ChatEventEnum.USER_ONLINE,
         user._id.toString(),
-        (userId: String) => {
+        (userId: string) => {
           console.log("received: ", userId);
         }
       );
-      // send status to only friends
-      for (var friend in user.friends) {
-        socket
-          .in(friend.toString())
-          .emit(
-            ChatEventEnum.USER_ONLINE,
-            user._id.toString(),
-            (userId: String) => {
-              console.log("received: ", userId);
-            }
-          );
-      }
+      socket.onAnyOutgoing((event) => {
+        console.log("onAnyOutgoing: Event sent: ", event);
+      });
+      socket.onAny((event) => {
+        console.log("onAny: Event sent: ", event);
+      });
+      io.engine.on("connection_error", (err) => {
+        console.log("connection_err_s");
+        console.log(err.req); // the request object
+        console.log(err.code); // the error code, for example 1
+        console.log(err.message); // the error message, for example "Session ID unknown"
+        console.log(err.context); // some additional error context
+        console.log("connection_err_e");
+      });
       console.log("User connected, user id: ", user._id.toString());
 
       socket.on(ChatEventEnum.JOIN_CHAT_EVENT, (chatId) => {
@@ -119,6 +121,11 @@ export function initializeSocketIO(io: Server) {
         ChatEventEnum.SOCKET_ERROR_EVENT,
         error?.message || "Something went wrong while connecting to the socket."
       );
+      console.log("user offline", socket.user?._id.toString());
+      socket.emit(ChatEventEnum.USER_OFFLINE, socket.user?._id.toString());
+      if (socket.user?._id) {
+        socket.leave(socket.user._id.toString());
+      }
     }
   });
 }
