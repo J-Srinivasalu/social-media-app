@@ -7,13 +7,13 @@ export function generateAccessToken(user: IUser): string {
     { id: user._id, email: user.email },
     config.accessTokenSecretKey,
     {
-      expiresIn: 10 * 60 * 60,
+      expiresIn: config.accessTokenExpiry,
     }
   );
 }
 
 export function generateRefreshToken(id: string): string {
   return jwt.sign({ id }, config.refreshTokenSecretKey, {
-    expiresIn: "5d",
+    expiresIn: config.refreshTokenExpiry,
   });
 }
