@@ -1,10 +1,18 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { loginUser, registerUser } from "../services/auth.service";
+import {
+  generateAccessAndRefreshToken,
+  loginUser,
+  logout,
+  registerUser,
+} from "../services/auth.service";
 import { ApiResponse } from "../models/apiResponse.model";
 import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
+import jwt from "jsonwebtoken";
+import config from "../config/config";
+import { AuthenticatedRequest, DecodedRefreshToken } from "../utils/types.util";
 
 const registerSchema = z.object({
   fullName: z.string().min(1),
@@ -58,12 +66,18 @@ export async function registerController(req: Request, res: Response) {
       throw new ApiError(400, "Bad Request", errorMessage);
     }
     const { fullName, email, username, password } = parsedRequest.data;
-    const token = await registerUser(fullName, email, username, password);
+    const { token, refreshToken } = await registerUser(
+      fullName,
+      email,
+      username,
+      password
+    );
 
     const apiResponse: ApiResponse = new ApiResponse(
       "User registered successfully",
       {
-        token: token,
+        token,
+        refreshToken,
       }
     );
     res.status(201).json(apiResponse);
@@ -84,12 +98,70 @@ export async function loginController(req: Request, res: Response) {
       throw new ApiError(400, "Bad Request", errorMessage);
     }
     const { email, password } = parsedRequest.data;
-    const token = await loginUser(email, password);
+    const { token, refreshToken } = await loginUser(email, password);
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "User logged in successfully",
+      {
+        token,
+        refreshToken,
+      }
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+export async function logoutController(req: Request, res: Response) {
+  try {
+    const decoded = (req as AuthenticatedRequest).user;
+    await logout(decoded.id);
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "User logged out successfully"
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+const refreshAccessTokenSchema = z.object({
+  refreshToken: z.string(),
+});
+
+export async function refreshAccessTokenController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const parsedRequest = refreshAccessTokenSchema.safeParse(req.body);
+    if (!parsedRequest.success) {
+      const errorMessage = fromZodError(parsedRequest.error).message.replace(
+        /"/g,
+        "'"
+      );
+      console.log(errorMessage);
+      throw new ApiError(400, "Bad Request", errorMessage);
+    }
+    const { refreshToken } = parsedRequest.data;
+
+    const decodedToken = jwt.verify(
+      refreshToken,
+      config.refreshTokenSecretKey
+    ) as DecodedRefreshToken;
+
+    const { token, newRefreshToken } = await generateAccessAndRefreshToken(
+      decodedToken.id,
+      refreshToken
+    );
 
     const apiResponse: ApiResponse = new ApiResponse(
       "User logged in successfully",
       {
         token: token,
+        refreshToken: newRefreshToken,
       }
     );
     res.status(200).json(apiResponse);

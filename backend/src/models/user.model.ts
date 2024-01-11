@@ -48,6 +48,7 @@ const userSchema = new Schema(
       },
     ],
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    refreshToken: { type: String },
     isOnline: { type: Boolean },
     fcmToken: { type: String },
   },
@@ -72,6 +73,8 @@ userSchema.pre("save", async function (next) {
     next(error as Error);
   }
 });
+
+userSchema.methods.generateAccessToken = () => {};
 
 const User = mongoose.model<IUser>("User", userSchema);
 

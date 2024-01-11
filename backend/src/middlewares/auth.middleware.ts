@@ -3,6 +3,7 @@ import ApiError from "../utils/error.util";
 import handleApiError from "../utils/apiErrorHandler";
 import jwt, { NotBeforeError, TokenExpiredError } from "jsonwebtoken";
 import { AuthenticatedRequest, DecodedToken } from "../utils/types.util";
+import config from "../config/config";
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
@@ -14,7 +15,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
     const decoded = jwt.verify(
       token,
-      process.env.SECRET_KEY ?? ""
+      config.accessTokenSecretKey ?? ""
     ) as DecodedToken;
 
     (req as AuthenticatedRequest).user = decoded;
