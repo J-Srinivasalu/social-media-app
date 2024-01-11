@@ -7,7 +7,7 @@ export function generateAccessToken(user: IUser): string {
     { id: user._id, email: user.email },
     config.accessTokenSecretKey,
     {
-      expiresIn: "1d",
+      expiresIn: 10 * 60 * 60,
     }
   );
 }
