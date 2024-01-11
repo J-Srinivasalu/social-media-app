@@ -38,6 +38,7 @@ _yet to deploy the app_
 17. **start chat:** Endpoint to start chat with a friend.
 18. **send message:** Endpoint to send a message in a chat.
 19. **get realtime feedback(typing, online, sent, seen):** using socket.io giving feedback to users in realtime.
+20. **Refresh token mechanism:** to make app more user friendly.
 
 ### Frontend
 
