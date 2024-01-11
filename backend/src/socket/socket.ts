@@ -9,6 +9,7 @@ import {
   updateAllMessagesInChatToRead,
   updateMessageStatus,
 } from "../services/chat.service";
+import config from "../config/config";
 
 export function initializeSocketIO(io: Server) {
   console.log("socket.io initialization started");
@@ -27,7 +28,7 @@ export function initializeSocketIO(io: Server) {
 
       const decoded = jwt.verify(
         token,
-        process.env.SECRET_KEY ?? ""
+        config.accessTokenSecretKey ?? ""
       ) as DecodedToken;
 
       console.log(decoded);
