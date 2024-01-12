@@ -27,7 +27,7 @@ chatRouter.get("/message", authenticate, (req: Request, res: Response) => {
   getMessagesForChatController(req, res);
 });
 
-chatRouter.get(
+chatRouter.post(
   "/call/video/offer",
   authenticate,
   (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ chatRouter.get(
   }
 );
 
-chatRouter.get(
+chatRouter.post(
   "/call/video/reject",
   authenticate,
   (req: Request, res: Response) => {
