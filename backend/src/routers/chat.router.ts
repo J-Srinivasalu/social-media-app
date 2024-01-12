@@ -5,6 +5,8 @@ import {
   sendMessageController,
   createOrGetChatController,
   getMessagesForChatController,
+  sendVideoCallRequestController,
+  rejectVideoCallRequestController,
 } from "../controllers/chat.controller";
 
 const chatRouter = Router();
@@ -24,5 +26,21 @@ chatRouter.get("/", authenticate, (req: Request, res: Response) => {
 chatRouter.get("/message", authenticate, (req: Request, res: Response) => {
   getMessagesForChatController(req, res);
 });
+
+chatRouter.get(
+  "/call/video/offer",
+  authenticate,
+  (req: Request, res: Response) => {
+    sendVideoCallRequestController(req, res);
+  }
+);
+
+chatRouter.get(
+  "/call/video/reject",
+  authenticate,
+  (req: Request, res: Response) => {
+    rejectVideoCallRequestController(req, res);
+  }
+);
 
 export default chatRouter;

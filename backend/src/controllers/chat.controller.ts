@@ -9,11 +9,14 @@ import {
   createChat,
   getChatsByUser,
   getMessagesForChat,
+  sendVideoCallRequest,
+  onVideoCallRequestRejected,
 } from "../services/chat.service";
 import { AuthenticatedRequest } from "../utils/types.util";
 import { emitSocketEvent } from "../socket/socket";
 import { ChatEventEnum } from "../utils/constant";
 import { IChat } from "../models/chat.model";
+import { IChatMessage } from "../models/message.model";
 
 const sendMessageSchema = z.object({
   content: z.string(),
@@ -144,6 +147,101 @@ export async function getMessagesForChatController(
       {
         messages: messages,
       }
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+const callRequestSchema = z.object({
+  chatId: z.string(),
+  offer: z.string(),
+});
+
+export async function sendVideoCallRequestController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const userId = (req as AuthenticatedRequest).user.id;
+
+    const parsedRequest = callRequestSchema.safeParse(req.body);
+    if (!parsedRequest.success) {
+      const errorMessage = fromZodError(parsedRequest.error).message.replace(
+        /"/g,
+        "'"
+      );
+      throw new ApiError(400, "Bad Request", errorMessage);
+    }
+
+    const { chatId, offer } = parsedRequest.data;
+    const newMessage = await sendVideoCallRequest(
+      userId,
+      chatId,
+      offer,
+      (user, receiverId, newMessage) => {
+        console.log(`${ChatEventEnum.VIDEO_CALL_OFFER_EVENT} ${receiverId}`);
+        emitSocketEvent(req, receiverId, ChatEventEnum.VIDEO_CALL_OFFER_EVENT, {
+          user,
+          chatId,
+          offer,
+          message: newMessage,
+        });
+      }
+    );
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "Sent video call request successfully",
+      {
+        message: newMessage,
+      }
+    );
+    res.status(201).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+const rejectCallRequestSchema = z.object({
+  messageId: z.string(),
+});
+
+export async function rejectVideoCallRequestController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const parsedRequest = rejectCallRequestSchema.safeParse(req.body);
+    if (!parsedRequest.success) {
+      const errorMessage = fromZodError(parsedRequest.error).message.replace(
+        /"/g,
+        "'"
+      );
+      throw new ApiError(400, "Bad Request", errorMessage);
+    }
+
+    const { messageId } = parsedRequest.data;
+    await onVideoCallRequestRejected(messageId, (senderId, messageId) => {
+      console.log(
+        `${ChatEventEnum.VIDEO_CALL_REJECT_EVENT} ${senderId} - ${messageId}`
+      );
+      emitSocketEvent(
+        req,
+        senderId,
+        ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
+        messageId
+      );
+      emitSocketEvent(
+        req,
+        senderId,
+        ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT,
+        messageId
+      );
+    });
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "video call request rejected"
     );
     res.status(200).json(apiResponse);
   } catch (error) {

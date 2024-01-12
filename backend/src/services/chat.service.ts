@@ -4,6 +4,7 @@ import { checkIfUserExistThenReturnUser } from "./user.service";
 import ChatMessage, { IChatMessage } from "../models/message.model";
 import { MessageStatus } from "../utils/constant";
 import { sendNotificationToSingleUser } from "./firebase.service";
+import { IUser } from "../models/user.model";
 
 export async function sendMessage(
   senderId: string,
@@ -142,7 +143,7 @@ export async function updateMessageStatus(
 
 export async function updateAllMessagesInChatToRead(
   chatId: string,
-  callback: (senderId: string, messageId: string) => void
+  callback: () => void
 ) {
   const chat = await Chat.findById(chatId);
   if (!chat) {
@@ -200,4 +201,102 @@ export async function getMessagesForChat(
     });
 
   return messages;
+}
+
+export async function sendVideoCallRequest(
+  senderId: string,
+  chatId: string,
+  offer: string,
+  callback: (user: IUser, receiverId: string, newMessage: IChatMessage) => void
+) {
+  const user = await checkIfUserExistThenReturnUser(senderId);
+  let chat = await Chat.findById(chatId);
+
+  if (!chat) {
+    throw new ApiError(404, "Not Found", "Chat not found");
+  }
+  console.log("senderId: ", user._id);
+  console.log("participents: ", JSON.stringify(chat.participants));
+  const receiverId = chat.participants.find(
+    (userId) => userId.toString() !== user._id.toString()
+  );
+  const receiver = await checkIfUserExistThenReturnUser(receiverId?.toString());
+  console.log(`receiver: ${JSON.stringify(receiver)}`);
+
+  const newMessage = await ChatMessage.create({
+    chat: chat._id,
+    sender: user._id,
+    content: "Video Call: ongoing",
+    status: MessageStatus.Sent,
+  });
+
+  const popluatedMessage = await ChatMessage.findById(newMessage._id).populate({
+    path: "sender",
+    select: "_id fullName username profilePic isOnline updatedAt createdAt",
+  });
+
+  chat.lastMessage = newMessage._id;
+  chat.save();
+
+  if (receiver.fcmToken) {
+    sendNotificationToSingleUser(
+      receiver.fcmToken,
+      user.fullName,
+      newMessage.content,
+      {
+        action: "video_call",
+        chatId: chat._id.toString(),
+        id: user._id.toString(),
+        fullName: user.fullName,
+        username: user.username,
+        profilePic: user.profilePic ?? "",
+        offer: offer,
+      }
+    );
+  }
+
+  callback(user, receiver._id.toString(), popluatedMessage!!);
+  return popluatedMessage;
+}
+
+export async function onVideoCallRequestRejected(
+  messageId: string,
+  callback: (senderId: string, messageId: string) => void
+) {
+  const message = await ChatMessage.findById(messageId);
+  if (!message) {
+    console.log("onVideoCallRequestRejected failed: message not found");
+    return;
+  }
+  message.content = "Video call: Missed";
+  message.save();
+  updateMessageStatus(message._id.toString(), MessageStatus.Seen, callback);
+}
+
+export async function updateCallMessage(
+  messageId: string,
+  duration: string,
+  callback: (senderId: string, messageId: string) => void
+) {
+  try {
+    const updatedMessage = await ChatMessage.findByIdAndUpdate(
+      messageId,
+      { $set: { content: `Video call: ${duration}` } },
+      { new: true }
+    ).populate({
+      path: "sender",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    });
+
+    const chatId = updatedMessage?.chat;
+    if (chatId) {
+      callback(updatedMessage.sender.toString(), updatedMessage._id.toString());
+    } else {
+      console.log("conversation id was null");
+    }
+  } catch (error: any) {
+    console.log(
+      error?.message ?? "Something went wrong while updating message status"
+    );
+  }
 }

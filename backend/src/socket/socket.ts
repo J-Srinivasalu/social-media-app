@@ -7,6 +7,7 @@ import { ChatEventEnum, MessageStatus } from "../utils/constant";
 import { Request } from "express";
 import {
   updateAllMessagesInChatToRead,
+  updateCallMessage,
   updateMessageStatus,
 } from "../services/chat.service";
 import config from "../config/config";
@@ -91,13 +92,46 @@ export function initializeSocketIO(io: Server) {
 
       socket.on(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, (chatId) => {
         console.log(`${ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT} ${chatId}`);
-        updateAllMessagesInChatToRead(chatId, (senderId, messageId) => {
+        updateAllMessagesInChatToRead(chatId, () => {
           console.log(
             `EMIT ${ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT} ${chatId}`
           );
         });
         socket.in(chatId).emit(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, chatId);
       });
+
+      socket.on(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, ({ chatId, answer }) => {
+        console.log(
+          `${ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT} ${chatId} ${answer}`
+        );
+        socket.in(chatId).emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
+      });
+
+      socket.on(
+        ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT,
+        ({ chatId, candidate }) => {
+          console.log(
+            `${ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT} ${chatId} ${candidate}`
+          );
+          socket
+            .in(chatId)
+            .emit(ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT, candidate);
+        }
+      );
+
+      socket.on(
+        ChatEventEnum.VIDEO_CALL_ENDED_EVENT,
+        ({ chatId, messageId, duration }) => {
+          console.log(
+            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
+          );
+          updateCallMessage(messageId, duration, (senderId, updatedMessage) => {
+            socket
+              .in(senderId)
+              .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, updatedMessage);
+          });
+        }
+      );
 
       socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
         console.log("User disconnected, user id", socket.user?._id.toString());

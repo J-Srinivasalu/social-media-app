@@ -29,6 +29,12 @@ export const ChatEventEnum = Object.freeze({
   USER_OFFLINE: "userOffline",
   // ? when user comes online
   USER_ONLINE: "userOnline",
+
+  VIDEO_CALL_OFFER_EVENT: "videoCallOffer",
+  VIDEO_CALL_ACCEPT_EVENT: "videoCallAccept",
+  VIDEO_CALL_REJECT_EVENT: "videoCallReject",
+  VIDEO_CALL_ADD_CONDIDATE_EVENT: "videoCallAddCondidate",
+  VIDEO_CALL_ENDED_EVENT: "videoCallEnded",
 });
 
 export const AvailableChatEvents = Object.values(ChatEventEnum);
