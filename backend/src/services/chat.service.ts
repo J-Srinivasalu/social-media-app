@@ -4,7 +4,7 @@ import { checkIfUserExistThenReturnUser } from "./user.service";
 import ChatMessage, { IChatMessage } from "../models/message.model";
 import { MessageStatus } from "../utils/constant";
 import { sendNotificationToSingleUser } from "./firebase.service";
-import { IUser } from "../models/user.model";
+import User, { IUser } from "../models/user.model";
 
 export async function sendMessage(
   senderId: string,
@@ -255,7 +255,11 @@ export async function sendVideoCallRequest(
     );
   }
 
-  callback(user, receiver._id.toString(), popluatedMessage!!);
+  const popluatedUser: IUser = await User.findById(user._id).select(
+    "_id fullName username profilePic isOnline updatedAt createdAt"
+  );
+
+  callback(popluatedUser, receiver._id.toString(), popluatedMessage!!);
   return popluatedMessage;
 }
 
