@@ -31,6 +31,7 @@ export const ChatEventEnum = Object.freeze({
   USER_ONLINE: "userOnline",
 
   VIDEO_CALL_OFFER_EVENT: "videoCallOffer",
+  VIDEO_CALL_FETCH_OFFER_EVENT: "videoCallFetchOffer",
   VIDEO_CALL_ACCEPT_EVENT: "videoCallAccept",
   VIDEO_CALL_REJECT_EVENT: "videoCallReject",
   VIDEO_CALL_ADD_CONDIDATE_EVENT: "videoCallAddCondidate",

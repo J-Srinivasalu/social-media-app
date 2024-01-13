@@ -246,11 +246,11 @@ export async function sendVideoCallRequest(
       {
         action: "video_call",
         chatId: chat._id.toString(),
+        messageId: newMessage._id.toString(),
         id: user._id.toString(),
         fullName: user.fullName,
         username: user.username,
         profilePic: user.profilePic ?? "",
-        offer: offer,
       }
     );
   }
@@ -261,6 +261,15 @@ export async function sendVideoCallRequest(
 
   callback(popluatedUser, receiver._id.toString(), popluatedMessage!!);
   return popluatedMessage;
+}
+
+export async function fetchMessage(
+  messageId: string,
+  callback: (message: IChatMessage | null) => void
+) {
+  const message = await ChatMessage.findById(messageId);
+  callback(message);
+  return message;
 }
 
 export async function onVideoCallRequestRejected(

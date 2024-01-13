@@ -6,6 +6,7 @@ import { CustomSocket, DecodedToken } from "../utils/types.util";
 import { ChatEventEnum, MessageStatus } from "../utils/constant";
 import { Request } from "express";
 import {
+  fetchMessage,
   updateAllMessagesInChatToRead,
   updateCallMessage,
   updateMessageStatus,
@@ -98,6 +99,17 @@ export function initializeSocketIO(io: Server) {
           );
         });
         socket.in(chatId).emit(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, chatId);
+      });
+
+      socket.on(ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT, (messageId) => {
+        console.log(
+          `${ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT} ${messageId}`
+        );
+        fetchMessage(messageId, (message) => {
+          socket
+            .to(user._id.toString())
+            .emit(ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT, message);
+        });
       });
 
       socket.on(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, ({ chatId, answer }) => {

@@ -22,6 +22,9 @@ const chatMessageSchema = new Schema(
       enum: Object.values(MessageStatus),
       default: MessageStatus.Sent,
     },
+    offer: {
+      type: String,
+    },
   },
   {
     timestamps: true,
