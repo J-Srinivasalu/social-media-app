@@ -106,8 +106,10 @@ export function initializeSocketIO(io: Server) {
           `${ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT} ${messageId}`
         );
         fetchMessage(messageId, (message) => {
+          const userId = user._id.toString();
+          console.log(`inside fetch message ${messageId} ${userId}`);
           socket
-            .in(user._id.toString())
+            .in(userId)
             .emit(ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT, message);
         });
       });
