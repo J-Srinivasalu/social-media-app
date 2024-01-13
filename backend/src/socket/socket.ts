@@ -107,7 +107,7 @@ export function initializeSocketIO(io: Server) {
         );
         fetchMessage(messageId, (message) => {
           socket
-            .to(user._id.toString())
+            .in(user._id.toString())
             .emit(ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT, message);
         });
       });
