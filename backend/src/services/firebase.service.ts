@@ -48,7 +48,10 @@ export async function sendNotificationToUsers(
     //   body: body,
     // },
     data: data,
-    token: recipientToken, // Assume you have a function to get FCM tokens for users
+    token: recipientToken,
+    content_available: true,
+    priority: "high",
+    // Assume you have a function to get FCM tokens for users
   }));
 
   try {
