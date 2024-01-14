@@ -11,12 +11,12 @@ import {
   getMessagesForChat,
   sendVideoCallRequest,
   onVideoCallRequestRejected,
+  fetchMessage,
 } from "../services/chat.service";
 import { AuthenticatedRequest } from "../utils/types.util";
 import { emitSocketEvent } from "../socket/socket";
 import { ChatEventEnum } from "../utils/constant";
 import { IChat } from "../models/chat.model";
-import { IChatMessage } from "../models/message.model";
 
 const sendMessageSchema = z.object({
   content: z.string(),
@@ -146,6 +146,24 @@ export async function getMessagesForChatController(
       "Messages fetched Successfully",
       {
         messages: messages,
+      }
+    );
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    handleApiError(res, error);
+  }
+}
+
+export async function getMessageController(req: Request, res: Response) {
+  try {
+    const messageId = req.params.id;
+
+    const message = await fetchMessage(messageId);
+
+    const apiResponse: ApiResponse = new ApiResponse(
+      "Message fetched Successfully",
+      {
+        message: message,
       }
     );
     res.status(200).json(apiResponse);

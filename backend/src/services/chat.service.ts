@@ -46,20 +46,17 @@ export async function sendMessage(
   chat.save();
 
   if (receiver.fcmToken) {
-    sendNotificationToSingleUser(
-      receiver.fcmToken,
-      user.fullName,
-      newMessage.content,
-      {
-        action: "message",
-        chatId: chat._id.toString(),
-        id: user._id.toString(),
-        fullName: user.fullName,
-        username: user.username,
-        profilePic: user.profilePic ?? "",
-        content: newMessage.content,
-      }
-    );
+    sendNotificationToSingleUser(receiver.fcmToken, {
+      title: user.fullName,
+      body: newMessage.content,
+      action: "message",
+      chatId: chat._id.toString(),
+      id: user._id.toString(),
+      fullName: user.fullName,
+      username: user.username,
+      profilePic: user.profilePic ?? "",
+      content: newMessage.content,
+    });
   }
 
   callback(receiver._id.toString(), popluatedMessage!!);
@@ -239,20 +236,17 @@ export async function sendVideoCallRequest(
   chat.save();
 
   if (receiver.fcmToken) {
-    sendNotificationToSingleUser(
-      receiver.fcmToken,
-      user.fullName,
-      newMessage.content,
-      {
-        action: "video_call",
-        chatId: chat._id.toString(),
-        messageId: newMessage._id.toString(),
-        id: user._id.toString(),
-        fullName: user.fullName,
-        username: user.username,
-        profilePic: user.profilePic ?? "",
-      }
-    );
+    sendNotificationToSingleUser(receiver.fcmToken, {
+      title: user.fullName,
+      body: newMessage.content,
+      action: "video_call",
+      chatId: chat._id.toString(),
+      messageId: newMessage._id.toString(),
+      id: user._id.toString(),
+      fullName: user.fullName,
+      username: user.username,
+      profilePic: user.profilePic ?? "",
+    });
   }
 
   const popluatedUser: IUser = await User.findById(user._id).select(
@@ -265,10 +259,12 @@ export async function sendVideoCallRequest(
 
 export async function fetchMessage(
   messageId: string,
-  callback: (message: IChatMessage | null) => void
+  callback?: (message: IChatMessage | null) => void
 ) {
   const message = await ChatMessage.findById(messageId);
-  callback(message);
+  if (callback != null) {
+    callback(message);
+  }
   return message;
 }
 

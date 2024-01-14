@@ -7,6 +7,7 @@ import {
   getMessagesForChatController,
   sendVideoCallRequestController,
   rejectVideoCallRequestController,
+  getMessageController,
 } from "../controllers/chat.controller";
 
 const chatRouter = Router();
@@ -25,6 +26,10 @@ chatRouter.get("/", authenticate, (req: Request, res: Response) => {
 
 chatRouter.get("/message", authenticate, (req: Request, res: Response) => {
   getMessagesForChatController(req, res);
+});
+
+chatRouter.get("/message/:id", authenticate, (req: Request, res: Response) => {
+  getMessageController(req, res);
 });
 
 chatRouter.post(

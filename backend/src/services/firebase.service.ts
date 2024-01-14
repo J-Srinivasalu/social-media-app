@@ -11,15 +11,14 @@ const messaging = admin.messaging();
 
 export async function sendNotificationToSingleUser(
   recipientToken: string,
-  title: string,
-  body: string,
   data: { [key: string]: string }
 ): Promise<void> {
   const message: admin.messaging.Message = {
-    notification: {
-      title: title,
-      body: body,
-    },
+    // try to use awesome_flutter: for video call feature
+    // notification: {
+    //   title: title,
+    //   body: body,
+    // },
     data: data,
     token: recipientToken,
   };
@@ -40,15 +39,14 @@ export async function sendNotificationToSingleUser(
 
 export async function sendNotificationToUsers(
   recipientTokens: string[],
-  title: string,
-  body: string,
   data: { [key: string]: string }
 ): Promise<void> {
   const messages = recipientTokens.map((recipientToken) => ({
-    notification: {
-      title: title,
-      body: body,
-    },
+    // try to use awesome_flutter: for video call feature
+    // notification: {
+    //   title: title,
+    //   body: body,
+    // },
     data: data,
     token: recipientToken, // Assume you have a function to get FCM tokens for users
   }));

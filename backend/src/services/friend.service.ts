@@ -30,18 +30,15 @@ export async function sendFriendRequest(userId: string, recieverId: string) {
   });
   await user.save();
   if (reciever.fcmToken) {
-    sendNotificationToSingleUser(
-      reciever.fcmToken,
-      "Friend request",
-      `${user.fullName} wants to be your friend!`,
-      {
-        action: "friend_request",
-        id: user._id.toString(),
-        fullName: user.fullName,
-        username: user.username,
-        profilePic: user.profilePic ?? "",
-      }
-    );
+    sendNotificationToSingleUser(reciever.fcmToken, {
+      title: "Friend request",
+      body: `${user.fullName} wants to be your friend!`,
+      action: "friend_request",
+      id: user._id.toString(),
+      fullName: user.fullName,
+      username: user.username,
+      profilePic: user.profilePic ?? "",
+    });
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
   }
@@ -68,9 +65,10 @@ export async function sendUnfriendRequest(userId: string, recieverId: string) {
   if (reciever.fcmToken) {
     sendNotificationToSingleUser(
       reciever.fcmToken,
-      "Unfriend request",
-      `${user.fullName} unfriended you`,
+
       {
+        title: "Unfriend request",
+        body: `${user.fullName} unfriended you`,
         action: "unfriend_request",
         id: user._id.toString(),
         fullName: user.fullName,
@@ -128,9 +126,10 @@ export async function acceptFriendRequest(userId: string, senderId: string) {
   if (sender.fcmToken) {
     sendNotificationToSingleUser(
       sender.fcmToken,
-      "Friend request",
-      `${user.fullName} is your friend now!`,
+
       {
+        title: "Friend request",
+        body: `${user.fullName} is your friend now!`,
         action: "accept_friend",
         id: user._id.toString(),
         fullName: user.fullName,
@@ -183,18 +182,15 @@ export async function rejectFriendRequest(userId: string, senderId: string) {
   await user.save();
   await sender.save();
   if (sender.fcmToken) {
-    sendNotificationToSingleUser(
-      sender.fcmToken,
-      "Friend request",
-      `${user.fullName} rejected your requets`,
-      {
-        action: "reject_friend",
-        id: user._id.toString(),
-        fullName: user.fullName,
-        username: user.username,
-        profilePic: user.profilePic ?? "",
-      }
-    );
+    sendNotificationToSingleUser(sender.fcmToken, {
+      title: "Friend request",
+      body: `${user.fullName} rejected your requets`,
+      action: "reject_friend",
+      id: user._id.toString(),
+      fullName: user.fullName,
+      username: user.username,
+      profilePic: user.profilePic ?? "",
+    });
   } else {
     console.log("Notification not sent, as reciever doesn't have fcmToken");
   }
