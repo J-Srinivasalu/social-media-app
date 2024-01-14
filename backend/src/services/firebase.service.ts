@@ -14,22 +14,8 @@ export async function sendNotificationToSingleUser(
   data: { [key: string]: string }
 ): Promise<void> {
   const message: admin.messaging.Message = {
-    // try to use awesome_flutter: for video call feature
-    notification: {
-      title: "title",
-      body: "body",
-    },
-    // notification: {},
     data: data,
     token: recipientToken,
-    apns: {
-      payload: {
-        aps: {
-          contentAvailable: true,
-        },
-        priority: "high",
-      },
-    },
   };
 
   if (recipientToken == "") {
@@ -51,22 +37,8 @@ export async function sendNotificationToUsers(
   data: { [key: string]: string }
 ): Promise<void> {
   const messages = recipientTokens.map((recipientToken) => ({
-    // try to use awesome_flutter: for video call feature
-    // notification: {
-    //   title: title,
-    //   body: body,
-    // },
     data: data,
     token: recipientToken,
-    apns: {
-      payload: {
-        aps: {
-          contentAvailable: true,
-        },
-        priority: "high",
-      },
-    },
-    // Assume you have a function to get FCM tokens for users
   }));
 
   try {
