@@ -23,12 +23,10 @@ export async function notifyTestController(req: Request, res: Response) {
 
     const { fcmToken } = parsedRequest.data;
 
-    await sendNotificationToSingleUser(
-      fcmToken,
-      "Test Notification",
-      "This is a test notification",
-      {}
-    );
+    await sendNotificationToSingleUser(fcmToken, {
+      title: "Test Notification",
+      body: "This is a test notification",
+    });
     res.status(200).json(new ApiResponse("Notification sent successfully"));
   } catch (error) {
     handleApiError(res, error);
