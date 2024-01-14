@@ -225,6 +225,7 @@ export async function sendVideoCallRequest(
     sender: user._id,
     content: "Video Call: ongoing",
     status: MessageStatus.Sent,
+    offer: offer,
   });
 
   const popluatedMessage = await ChatMessage.findById(newMessage._id).populate({
