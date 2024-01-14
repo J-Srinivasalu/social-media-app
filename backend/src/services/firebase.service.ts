@@ -19,8 +19,17 @@ export async function sendNotificationToSingleUser(
     //   title: title,
     //   body: body,
     // },
+    notification: {},
     data: data,
     token: recipientToken,
+    apns: {
+      payload: {
+        aps: {
+          contentAvailable: true,
+        },
+        priority: "high",
+      },
+    },
   };
 
   if (recipientToken == "") {
@@ -49,8 +58,14 @@ export async function sendNotificationToUsers(
     // },
     data: data,
     token: recipientToken,
-    content_available: true,
-    priority: "high",
+    apns: {
+      payload: {
+        aps: {
+          contentAvailable: true,
+        },
+        priority: "high",
+      },
+    },
     // Assume you have a function to get FCM tokens for users
   }));
 
