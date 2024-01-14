@@ -120,9 +120,7 @@ export function initializeSocketIO(io: Server) {
           console.log(
             `${ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT} ${chatId} ${answer}`
           );
-          socket
-            .in(receiverId)
-            .emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
+          socket.in(chatId).emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
         }
       );
 
@@ -133,7 +131,7 @@ export function initializeSocketIO(io: Server) {
             `${ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT} ${chatId} ${candidate}`
           );
           socket
-            .in(receiverId)
+            .in(chatId)
             .emit(ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT, candidate);
         }
       );
