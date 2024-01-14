@@ -15,11 +15,11 @@ export async function sendNotificationToSingleUser(
 ): Promise<void> {
   const message: admin.messaging.Message = {
     // try to use awesome_flutter: for video call feature
-    // notification: {
-    //   title: title,
-    //   body: body,
-    // },
-    notification: {},
+    notification: {
+      title: "title",
+      body: "body",
+    },
+    // notification: {},
     data: data,
     token: recipientToken,
     apns: {
