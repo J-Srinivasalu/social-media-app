@@ -114,21 +114,26 @@ export function initializeSocketIO(io: Server) {
         });
       });
 
-      socket.on(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, ({ chatId, answer }) => {
-        console.log(
-          `${ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT} ${chatId} ${answer}`
-        );
-        socket.in(chatId).emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
-      });
+      socket.on(
+        ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT,
+        ({ receiverId, chatId, answer }) => {
+          console.log(
+            `${ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT} ${chatId} ${answer}`
+          );
+          socket
+            .in(receiverId)
+            .emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
+        }
+      );
 
       socket.on(
         ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT,
-        ({ chatId, candidate }) => {
+        ({ receiverId, chatId, candidate }) => {
           console.log(
             `${ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT} ${chatId} ${candidate}`
           );
           socket
-            .in(chatId)
+            .in(receiverId)
             .emit(ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT, candidate);
         }
       );
