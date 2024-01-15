@@ -273,14 +273,19 @@ export async function onVideoCallRequestRejected(
   messageId: string,
   callback: (senderId: string, messageId: string) => void
 ) {
-  const message = await ChatMessage.findById(messageId);
-  if (!message) {
-    console.log("onVideoCallRequestRejected failed: message not found");
-    return;
+  try {
+    const message = await ChatMessage.findById(messageId);
+    if (!message) {
+      console.log("onVideoCallRequestRejected failed: message not found");
+      return;
+    }
+    message.content = "Video call: Declined";
+    message.save();
+    console.log("onVideoCallRequestRejected ");
+    callback(message.sender.toString(), message._id.toString());
+  } catch (error: any) {
+    console.log(error?.message ?? "Something went wrong while rejecting call");
   }
-  message.content = "Video call: Missed";
-  message.save();
-  updateMessageStatus(message._id.toString(), MessageStatus.Seen, callback);
 }
 
 export async function updateCallMessage(
@@ -289,6 +294,14 @@ export async function updateCallMessage(
   callback: (senderId: string, messageId: string) => void
 ) {
   try {
+    console.log(
+      "updateCallMessage: messageId",
+      messageId,
+      " duration: ",
+      duration
+    );
+    const callMissed = duration == "0s";
+    duration = callMissed ? "Missed" : duration;
     const updatedMessage = await ChatMessage.findByIdAndUpdate(
       messageId,
       { $set: { content: `Video call: ${duration}` } },
@@ -302,7 +315,7 @@ export async function updateCallMessage(
     if (chatId) {
       callback(updatedMessage.sender.toString(), updatedMessage._id.toString());
     } else {
-      console.log("conversation id was null");
+      console.log("chat id was null");
     }
   } catch (error: any) {
     console.log(

@@ -250,12 +250,6 @@ export async function rejectVideoCallRequestController(
         ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
         messageId
       );
-      emitSocketEvent(
-        req,
-        senderId,
-        ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT,
-        messageId
-      );
     });
 
     const apiResponse: ApiResponse = new ApiResponse(

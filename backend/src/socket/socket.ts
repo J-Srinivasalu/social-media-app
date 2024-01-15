@@ -150,6 +150,22 @@ export function initializeSocketIO(io: Server) {
         }
       );
 
+      socket.on(
+        ChatEventEnum.VIDEO_CALL_MISSED_EVENT,
+        ({ chatId, messageId, duration }) => {
+          console.log(
+            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
+          );
+          updateCallMessage(messageId, duration, (senderId, updatedMessage) => {
+            socket.in(senderId).emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
+              user,
+              chatId,
+              message: updatedMessage,
+            });
+          });
+        }
+      );
+
       socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
         console.log("User disconnected, user id", socket.user?._id.toString());
         user.isOnline = false;
