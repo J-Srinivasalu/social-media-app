@@ -10,6 +10,7 @@ import {
   updateAllMessagesInChatToRead,
   updateCallMessage,
   updateMessageStatus,
+  missedCall,
 } from "../services/chat.service";
 import config from "../config/config";
 
@@ -152,12 +153,12 @@ export function initializeSocketIO(io: Server) {
 
       socket.on(
         ChatEventEnum.VIDEO_CALL_MISSED_EVENT,
-        ({ chatId, messageId, duration }) => {
+        ({ receiverId, chatId, messageId }) => {
           console.log(
-            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
+            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} `
           );
-          updateCallMessage(messageId, duration, (senderId, updatedMessage) => {
-            socket.in(senderId).emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
+          missedCall(messageId, (updatedMessage) => {
+            socket.in(receiverId).emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
               user,
               chatId,
               message: updatedMessage,

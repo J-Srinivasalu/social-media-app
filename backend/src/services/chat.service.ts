@@ -300,8 +300,6 @@ export async function updateCallMessage(
       " duration: ",
       duration
     );
-    const callMissed = duration == "0s";
-    duration = callMissed ? "Missed" : duration;
     const updatedMessage = await ChatMessage.findByIdAndUpdate(
       messageId,
       { $set: { content: `Video call: ${duration}` } },
@@ -314,6 +312,34 @@ export async function updateCallMessage(
     const chatId = updatedMessage?.chat;
     if (chatId) {
       callback(updatedMessage.sender.toString(), updatedMessage._id.toString());
+    } else {
+      console.log("chat id was null");
+    }
+  } catch (error: any) {
+    console.log(
+      error?.message ?? "Something went wrong while updating message status"
+    );
+  }
+}
+
+export async function missedCall(
+  messageId: string,
+  callback: (messageId: string) => void
+) {
+  try {
+    console.log("missedCall: messageId", messageId);
+    const updatedMessage = await ChatMessage.findByIdAndUpdate(
+      messageId,
+      { $set: { content: `Video call: Missed` } },
+      { new: true }
+    ).populate({
+      path: "sender",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    });
+
+    const chatId = updatedMessage?.chat;
+    if (chatId) {
+      callback(updatedMessage._id.toString());
     } else {
       console.log("chat id was null");
     }
