@@ -159,7 +159,6 @@ export function initializeSocketIO(io: Server) {
           );
           missedCall(messageId, (updatedMessage) => {
             socket.in(receiverId).emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
-              user,
               chatId,
               message: updatedMessage,
             });
