@@ -139,7 +139,7 @@ export function initializeSocketIO(io: Server) {
 
       socket.on(
         ChatEventEnum.VIDEO_CALL_ENDED_EVENT,
-        ({ receiverId, chatId, messageId, duration }) => {
+        ({ receiverId, chatId, messageId, duration, attended }) => {
           console.log(
             `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
           );
@@ -149,6 +149,16 @@ export function initializeSocketIO(io: Server) {
               message: updatedMessage,
             });
           });
+          if (!attended) {
+            missedCall(messageId, (updatedMessage) => {
+              socket
+                .in(receiverId)
+                .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
+                  chatId,
+                  message: updatedMessage,
+                });
+            });
+          }
         }
       );
 
