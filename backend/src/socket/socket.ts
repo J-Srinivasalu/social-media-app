@@ -8,7 +8,7 @@ import { Request } from "express";
 import {
   fetchMessage,
   updateAllMessagesInChatToRead,
-  updateCallMessage,
+  callEnded,
   updateMessageStatus,
   missedCall,
 } from "../services/chat.service";
@@ -139,13 +139,13 @@ export function initializeSocketIO(io: Server) {
 
       socket.on(
         ChatEventEnum.VIDEO_CALL_ENDED_EVENT,
-        ({ chatId, messageId, duration }) => {
+        ({ receiverId, chatId, messageId, duration }) => {
           console.log(
             `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
           );
-          updateCallMessage(messageId, duration, (senderId, updatedMessage) => {
+          callEnded(messageId, duration, (updatedMessage) => {
             socket
-              .in(senderId)
+              .in(receiverId)
               .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, updatedMessage);
           });
         }

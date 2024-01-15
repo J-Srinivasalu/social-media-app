@@ -288,10 +288,10 @@ export async function onVideoCallRequestRejected(
   }
 }
 
-export async function updateCallMessage(
+export async function callEnded(
   messageId: string,
   duration: string,
-  callback: (senderId: string, messageId: string) => void
+  callback: (message: IChatMessage) => void
 ) {
   try {
     console.log(
@@ -311,7 +311,7 @@ export async function updateCallMessage(
 
     const chatId = updatedMessage?.chat;
     if (chatId) {
-      callback(updatedMessage.sender.toString(), updatedMessage._id.toString());
+      callback(updatedMessage);
     } else {
       console.log("chat id was null");
     }
@@ -324,7 +324,7 @@ export async function updateCallMessage(
 
 export async function missedCall(
   messageId: string,
-  callback: (messageId: string) => void
+  callback: (message: IChatMessage) => void
 ) {
   try {
     console.log("missedCall: messageId", messageId);
@@ -339,7 +339,7 @@ export async function missedCall(
 
     const chatId = updatedMessage?.chat;
     if (chatId) {
-      callback(updatedMessage._id.toString());
+      callback(updatedMessage);
     } else {
       console.log("chat id was null");
     }
