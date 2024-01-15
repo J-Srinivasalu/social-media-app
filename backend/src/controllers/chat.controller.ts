@@ -202,6 +202,7 @@ export async function sendVideoCallRequestController(
         console.log(`${ChatEventEnum.VIDEO_CALL_OFFER_EVENT} ${receiverId}`);
         emitSocketEvent(req, receiverId, ChatEventEnum.VIDEO_CALL_OFFER_EVENT, {
           user,
+          receiverId,
           chatId,
           offer,
           message: newMessage,
@@ -222,6 +223,7 @@ export async function sendVideoCallRequestController(
 }
 
 const rejectCallRequestSchema = z.object({
+  receiverId: z.string(),
   messageId: z.string(),
 });
 
@@ -239,17 +241,19 @@ export async function rejectVideoCallRequestController(
       throw new ApiError(400, "Bad Request", errorMessage);
     }
 
-    const { messageId } = parsedRequest.data;
-    await onVideoCallRequestRejected(messageId, (senderId, messageId) => {
+    const { receiverId, messageId } = parsedRequest.data;
+    await onVideoCallRequestRejected(messageId, (senderId, chatId, message) => {
       console.log(
         `${ChatEventEnum.VIDEO_CALL_REJECT_EVENT} ${senderId} - ${messageId}`
       );
-      emitSocketEvent(
-        req,
-        senderId,
-        ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
-        messageId
-      );
+      emitSocketEvent(req, senderId, ChatEventEnum.VIDEO_CALL_REJECT_EVENT, {
+        chatId,
+        message,
+      });
+      emitSocketEvent(req, receiverId, ChatEventEnum.VIDEO_CALL_REJECT_EVENT, {
+        chatId,
+        message,
+      });
     });
 
     const apiResponse: ApiResponse = new ApiResponse(

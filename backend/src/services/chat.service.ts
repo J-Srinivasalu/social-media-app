@@ -242,6 +242,7 @@ export async function sendVideoCallRequest(
       body: newMessage.content,
       action: "video_call",
       chatId: chat._id.toString(),
+      receiverId: receiver._id.toString(),
       messageId: newMessage._id.toString(),
       id: user._id.toString(),
       fullName: user.fullName,
@@ -271,7 +272,7 @@ export async function fetchMessage(
 
 export async function onVideoCallRequestRejected(
   messageId: string,
-  callback: (senderId: string, messageId: string) => void
+  callback: (senderId: string, chatId: string, message: IChatMessage) => void
 ) {
   try {
     const message = await ChatMessage.findById(messageId);
@@ -282,7 +283,7 @@ export async function onVideoCallRequestRejected(
     message.content = "Video call: Declined";
     message.save();
     console.log("onVideoCallRequestRejected ");
-    callback(message.sender.toString(), message._id.toString());
+    callback(message.sender.toString(), message.chat.toString(), message);
   } catch (error: any) {
     console.log(error?.message ?? "Something went wrong while rejecting call");
   }

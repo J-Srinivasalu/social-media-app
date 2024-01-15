@@ -144,9 +144,10 @@ export function initializeSocketIO(io: Server) {
             `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
           );
           callEnded(messageId, duration, (updatedMessage) => {
-            socket
-              .in(receiverId)
-              .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, updatedMessage);
+            socket.in(receiverId).emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
+              chatId,
+              message: updatedMessage,
+            });
           });
         }
       );
