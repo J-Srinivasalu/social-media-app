@@ -141,18 +141,25 @@ export function initializeSocketIO(io: Server) {
         ChatEventEnum.VIDEO_CALL_ENDED_EVENT,
         ({ receiverId, chatId, messageId, duration, attended }) => {
           console.log(
-            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration}`
+            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration} ${attended}`
           );
           callEnded(messageId, duration, (updatedMessage) => {
-            socket.in(receiverId).emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
-              chatId,
-              message: updatedMessage,
-            });
+            socket
+              .in(receiverId)
+              .in(user._id.toString())
+              .in(chatId)
+              .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
+                chatId,
+                message: updatedMessage,
+              });
           });
           if (!attended) {
+            console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} missed`);
             missedCall(messageId, (updatedMessage) => {
               socket
                 .in(receiverId)
+                .in(user._id.toString())
+                .in(chatId)
                 .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
                   chatId,
                   message: updatedMessage,
