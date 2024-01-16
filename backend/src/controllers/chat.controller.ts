@@ -198,15 +198,16 @@ export async function sendVideoCallRequestController(
       userId,
       chatId,
       offer,
-      (user, receiverId, newMessage) => {
-        console.log(`${ChatEventEnum.VIDEO_CALL_OFFER_EVENT} ${receiverId}`);
-        emitSocketEvent(req, receiverId, ChatEventEnum.VIDEO_CALL_OFFER_EVENT, {
-          user,
-          receiverId,
-          chatId,
-          offer,
-          message: newMessage,
-        });
+      (newMessage) => {
+        console.log(`${ChatEventEnum.VIDEO_CALL_OFFER_EVENT} ${newMessage}`);
+        emitSocketEvent(
+          req,
+          newMessage.receiver.toString(),
+          ChatEventEnum.VIDEO_CALL_OFFER_EVENT,
+          {
+            message: newMessage,
+          }
+        );
       }
     );
 
@@ -223,7 +224,6 @@ export async function sendVideoCallRequestController(
 }
 
 const rejectCallRequestSchema = z.object({
-  receiverId: z.string(),
   messageId: z.string(),
 });
 
@@ -241,19 +241,25 @@ export async function rejectVideoCallRequestController(
       throw new ApiError(400, "Bad Request", errorMessage);
     }
 
-    const { receiverId, messageId } = parsedRequest.data;
-    await onVideoCallRequestRejected(messageId, (senderId, chatId, message) => {
-      console.log(
-        `${ChatEventEnum.VIDEO_CALL_REJECT_EVENT} ${senderId} - ${messageId}`
+    const { messageId } = parsedRequest.data;
+    await onVideoCallRequestRejected(messageId, (message) => {
+      console.log(`${ChatEventEnum.VIDEO_CALL_REJECT_EVENT} - ${message}`);
+      emitSocketEvent(
+        req,
+        message.sender.toString(),
+        ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
+        {
+          message,
+        }
       );
-      emitSocketEvent(req, senderId, ChatEventEnum.VIDEO_CALL_REJECT_EVENT, {
-        chatId,
-        message,
-      });
-      emitSocketEvent(req, receiverId, ChatEventEnum.VIDEO_CALL_REJECT_EVENT, {
-        chatId,
-        message,
-      });
+      emitSocketEvent(
+        req,
+        message.receiver.toString(),
+        ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
+        {
+          message,
+        }
+      );
     });
 
     const apiResponse: ApiResponse = new ApiResponse(

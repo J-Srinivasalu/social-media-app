@@ -1,5 +1,6 @@
 import { InferSchemaType, Schema, Types, model } from "mongoose";
 import { MessageStatus } from "../utils/constant";
+import { boolean } from "zod";
 
 const chatMessageSchema = new Schema(
   {
@@ -9,6 +10,11 @@ const chatMessageSchema = new Schema(
       required: true,
     },
     sender: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    receiver: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

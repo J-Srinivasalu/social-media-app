@@ -33,14 +33,20 @@ export async function sendMessage(
   const newMessage = await ChatMessage.create({
     chat: chat._id,
     sender: user._id,
+    receiver: receiver._id,
     content: content,
     status: MessageStatus.Sent,
   });
 
-  const popluatedMessage = await ChatMessage.findById(newMessage._id).populate({
-    path: "sender",
-    select: "_id fullName username profilePic isOnline updatedAt createdAt",
-  });
+  const popluatedMessage = await ChatMessage.findById(newMessage._id)
+    .populate({
+      path: "sender",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    })
+    .populate({
+      path: "receiver",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    });
 
   chat.lastMessage = newMessage._id;
   chat.save();
@@ -120,10 +126,15 @@ export async function updateMessageStatus(
       messageId,
       { $set: { status: status } },
       { new: true }
-    ).populate({
-      path: "sender",
-      select: "_id fullName username profilePic isOnline updatedAt createdAt",
-    });
+    )
+      .populate({
+        path: "sender",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      })
+      .populate({
+        path: "receiver",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      });
 
     const chatId = updatedMessage?.chat;
     if (chatId) {
@@ -195,6 +206,10 @@ export async function getMessagesForChat(
     .populate({
       path: "sender",
       select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    })
+    .populate({
+      path: "receiver",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
     });
 
   return messages;
@@ -204,7 +219,7 @@ export async function sendVideoCallRequest(
   senderId: string,
   chatId: string,
   offer: string,
-  callback: (user: IUser, receiverId: string, newMessage: IChatMessage) => void
+  callback: (newMessage: IChatMessage) => void
 ) {
   const user = await checkIfUserExistThenReturnUser(senderId);
   let chat = await Chat.findById(chatId);
@@ -223,15 +238,21 @@ export async function sendVideoCallRequest(
   const newMessage = await ChatMessage.create({
     chat: chat._id,
     sender: user._id,
+    receiver: receiver._id,
     content: "Video Call: ongoing",
     status: MessageStatus.Sent,
     offer: offer,
   });
 
-  const popluatedMessage = await ChatMessage.findById(newMessage._id).populate({
-    path: "sender",
-    select: "_id fullName username profilePic isOnline updatedAt createdAt",
-  });
+  const popluatedMessage = await ChatMessage.findById(newMessage._id)
+    .populate({
+      path: "sender",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    })
+    .populate({
+      path: "receiver",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    });
 
   chat.lastMessage = newMessage._id;
   chat.save();
@@ -251,31 +272,37 @@ export async function sendVideoCallRequest(
     });
   }
 
-  const popluatedUser: IUser = await User.findById(user._id).select(
-    "_id fullName username profilePic isOnline updatedAt createdAt"
-  );
-
-  callback(popluatedUser, receiver._id.toString(), popluatedMessage!!);
+  callback(popluatedMessage!!);
   return popluatedMessage;
 }
 
-export async function fetchMessage(
-  messageId: string,
-  callback?: (message: IChatMessage | null) => void
-) {
-  const message = await ChatMessage.findById(messageId);
-  if (callback != null) {
-    callback(message);
-  }
+export async function fetchMessage(messageId: string) {
+  const message = await ChatMessage.findById(messageId)
+    .populate({
+      path: "sender",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    })
+    .populate({
+      path: "receiver",
+      select: "_id fullName username profilePic isOnline updatedAt createdAt",
+    });
   return message;
 }
 
 export async function onVideoCallRequestRejected(
   messageId: string,
-  callback: (senderId: string, chatId: string, message: IChatMessage) => void
+  callback: (message: IChatMessage) => void
 ) {
   try {
-    const message = await ChatMessage.findById(messageId);
+    const message = await ChatMessage.findById(messageId)
+      .populate({
+        path: "sender",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      })
+      .populate({
+        path: "receiver",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      });
     if (!message) {
       console.log("onVideoCallRequestRejected failed: message not found");
       return;
@@ -283,7 +310,7 @@ export async function onVideoCallRequestRejected(
     message.content = "Video call: Declined";
     message.save();
     console.log("onVideoCallRequestRejected ");
-    callback(message.sender.toString(), message.chat.toString(), message);
+    callback(message);
   } catch (error: any) {
     console.log(error?.message ?? "Something went wrong while rejecting call");
   }
@@ -305,10 +332,15 @@ export async function callEnded(
       messageId,
       { $set: { content: `Video call: ${duration}` } },
       { new: true }
-    ).populate({
-      path: "sender",
-      select: "_id fullName username profilePic isOnline updatedAt createdAt",
-    });
+    )
+      .populate({
+        path: "sender",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      })
+      .populate({
+        path: "receiver",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      });
 
     const chatId = updatedMessage?.chat;
     if (chatId) {
@@ -333,10 +365,15 @@ export async function missedCall(
       messageId,
       { $set: { content: `Video call: Missed` } },
       { new: true }
-    ).populate({
-      path: "sender",
-      select: "_id fullName username profilePic isOnline updatedAt createdAt",
-    });
+    )
+      .populate({
+        path: "sender",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      })
+      .populate({
+        path: "receiver",
+        select: "_id fullName username profilePic isOnline updatedAt createdAt",
+      });
 
     const chatId = updatedMessage?.chat;
     if (chatId) {

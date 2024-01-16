@@ -13,6 +13,7 @@ import {
   missedCall,
 } from "../services/chat.service";
 import config from "../config/config";
+import { IChatMessage } from "../models/message.model";
 
 export function initializeSocketIO(io: Server) {
   console.log("socket.io initialization started");
@@ -102,26 +103,13 @@ export function initializeSocketIO(io: Server) {
         socket.in(chatId).emit(ChatEventEnum.CHAT_MESSAGES_SEEN_EVENT, chatId);
       });
 
-      socket.on(ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT, (messageId) => {
-        console.log(
-          `${ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT} ${messageId}`
-        );
-        fetchMessage(messageId, (message) => {
-          const userId = user._id.toString();
-          console.log(`inside fetch message ${messageId} ${userId}`);
-          socket
-            .in(userId)
-            .emit(ChatEventEnum.VIDEO_CALL_FETCH_OFFER_EVENT, message);
-        });
-      });
-
       socket.on(
         ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT,
-        ({ receiverId, chatId, answer }) => {
-          console.log(
-            `${ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT} ${chatId} ${answer}`
-          );
-          socket.in(chatId).emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
+        ({ senderId, answer }) => {
+          console.log(`${ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT} ${answer}`);
+          socket
+            .in(senderId)
+            .emit(ChatEventEnum.VIDEO_CALL_ACCEPT_EVENT, answer);
         }
       );
 
@@ -133,23 +121,23 @@ export function initializeSocketIO(io: Server) {
           );
           socket
             .in(chatId)
+            .in(receiverId)
             .emit(ChatEventEnum.VIDEO_CALL_ADD_CONDIDATE_EVENT, candidate);
         }
       );
 
       socket.on(
         ChatEventEnum.VIDEO_CALL_ENDED_EVENT,
-        ({ receiverId, chatId, messageId, duration, attended }) => {
+        ({ chatId, messageId, duration, attended }) => {
           console.log(
             `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration} ${attended}`
           );
           callEnded(messageId, duration, (updatedMessage) => {
             socket
-              .in(receiverId)
-              .in(user._id.toString())
+              .in(updatedMessage.sender.toString())
+              .in(updatedMessage.receiver.toString())
               .in(chatId)
               .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
-                chatId,
                 message: updatedMessage,
               });
           });
@@ -157,11 +145,10 @@ export function initializeSocketIO(io: Server) {
             console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} missed`);
             missedCall(messageId, (updatedMessage) => {
               socket
-                .in(receiverId)
-                .in(user._id.toString())
+                .in(updatedMessage.sender.toString())
+                .in(updatedMessage.receiver.toString())
                 .in(chatId)
                 .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
-                  chatId,
                   message: updatedMessage,
                 });
             });
@@ -169,20 +156,16 @@ export function initializeSocketIO(io: Server) {
         }
       );
 
-      socket.on(
-        ChatEventEnum.VIDEO_CALL_MISSED_EVENT,
-        ({ receiverId, chatId, messageId }) => {
-          console.log(
-            `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} `
-          );
-          missedCall(messageId, (updatedMessage) => {
-            socket.in(receiverId).emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
-              chatId,
+      socket.on(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, ({ messageId }) => {
+        console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${messageId} `);
+        missedCall(messageId, (updatedMessage) => {
+          socket
+            .in(updatedMessage.receiver.toString())
+            .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
               message: updatedMessage,
             });
-          });
-        }
-      );
+        });
+      });
 
       socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
         console.log("User disconnected, user id", socket.user?._id.toString());
