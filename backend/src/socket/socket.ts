@@ -130,15 +130,6 @@ export function initializeSocketIO(io: Server) {
           console.log(
             `${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${chatId} ${messageId} ${duration} ${attended}`
           );
-          callEnded(messageId, duration, (updatedMessage) => {
-            socket
-              .in(updatedMessage.sender._id.toString())
-              .in(updatedMessage.receiver._id.toString())
-              .in(chatId)
-              .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
-                message: updatedMessage,
-              });
-          });
           if (!attended) {
             console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} missed`);
             missedCall(messageId, (updatedMessage) => {
@@ -147,6 +138,16 @@ export function initializeSocketIO(io: Server) {
                 .in(updatedMessage.receiver._id.toString())
                 .in(chatId)
                 .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
+                  message: updatedMessage,
+                });
+            });
+          } else {
+            callEnded(messageId, duration, (updatedMessage) => {
+              socket
+                .in(updatedMessage.sender._id.toString())
+                .in(updatedMessage.receiver._id.toString())
+                .in(chatId)
+                .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
                   message: updatedMessage,
                 });
             });
