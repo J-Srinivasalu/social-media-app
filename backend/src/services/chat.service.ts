@@ -4,7 +4,6 @@ import { checkIfUserExistThenReturnUser } from "./user.service";
 import ChatMessage, { IChatMessage } from "../models/message.model";
 import { MessageStatus } from "../utils/constant";
 import { sendNotificationToSingleUser } from "./firebase.service";
-import User, { IUser } from "../models/user.model";
 
 export async function sendMessage(
   senderId: string,

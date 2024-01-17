@@ -6,14 +6,12 @@ import { CustomSocket, DecodedToken } from "../utils/types.util";
 import { ChatEventEnum, MessageStatus } from "../utils/constant";
 import { Request } from "express";
 import {
-  fetchMessage,
   updateAllMessagesInChatToRead,
   callEnded,
   updateMessageStatus,
   missedCall,
 } from "../services/chat.service";
 import config from "../config/config";
-import { IChatMessage } from "../models/message.model";
 
 export function initializeSocketIO(io: Server) {
   console.log("socket.io initialization started");
@@ -134,8 +132,8 @@ export function initializeSocketIO(io: Server) {
           );
           callEnded(messageId, duration, (updatedMessage) => {
             socket
-              .in(updatedMessage.sender.toString())
-              .in(updatedMessage.receiver.toString())
+              .in(updatedMessage.sender._id.toString())
+              .in(updatedMessage.receiver._id.toString())
               .in(chatId)
               .emit(ChatEventEnum.VIDEO_CALL_ENDED_EVENT, {
                 message: updatedMessage,
@@ -145,8 +143,8 @@ export function initializeSocketIO(io: Server) {
             console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} missed`);
             missedCall(messageId, (updatedMessage) => {
               socket
-                .in(updatedMessage.sender.toString())
-                .in(updatedMessage.receiver.toString())
+                .in(updatedMessage.sender._id.toString())
+                .in(updatedMessage.receiver._id.toString())
                 .in(chatId)
                 .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
                   message: updatedMessage,
@@ -160,7 +158,7 @@ export function initializeSocketIO(io: Server) {
         console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} ${messageId} `);
         missedCall(messageId, (updatedMessage) => {
           socket
-            .in(updatedMessage.receiver.toString())
+            .in(updatedMessage.receiver._id.toString())
             .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
               message: updatedMessage,
             });

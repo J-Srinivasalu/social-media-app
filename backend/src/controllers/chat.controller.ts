@@ -199,10 +199,14 @@ export async function sendVideoCallRequestController(
       chatId,
       offer,
       (newMessage) => {
-        console.log(`${ChatEventEnum.VIDEO_CALL_OFFER_EVENT} ${newMessage}`);
+        console.log(
+          `${ChatEventEnum.VIDEO_CALL_OFFER_EVENT}  ${JSON.stringify(
+            newMessage
+          )}`
+        );
         emitSocketEvent(
           req,
-          newMessage.receiver.toString(),
+          newMessage.receiver._id.toString(),
           ChatEventEnum.VIDEO_CALL_OFFER_EVENT,
           {
             message: newMessage,
@@ -243,10 +247,12 @@ export async function rejectVideoCallRequestController(
 
     const { messageId } = parsedRequest.data;
     await onVideoCallRequestRejected(messageId, (message) => {
-      console.log(`${ChatEventEnum.VIDEO_CALL_REJECT_EVENT} - ${message}`);
+      console.log(
+        `${ChatEventEnum.VIDEO_CALL_REJECT_EVENT} -  ${JSON.stringify(message)}`
+      );
       emitSocketEvent(
         req,
-        message.sender.toString(),
+        message.sender._id.toString(),
         ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
         {
           message,
@@ -254,7 +260,7 @@ export async function rejectVideoCallRequestController(
       );
       emitSocketEvent(
         req,
-        message.receiver.toString(),
+        message.receiver._id.toString(),
         ChatEventEnum.VIDEO_CALL_REJECT_EVENT,
         {
           message,
