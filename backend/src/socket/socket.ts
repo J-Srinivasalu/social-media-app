@@ -134,9 +134,9 @@ export function initializeSocketIO(io: Server) {
             console.log(`${ChatEventEnum.VIDEO_CALL_ENDED_EVENT} missed`);
             missedCall(messageId, (updatedMessage) => {
               socket
-                .in(updatedMessage.sender._id.toString())
                 .in(updatedMessage.receiver._id.toString())
                 .in(chatId)
+                .in(updatedMessage.sender._id.toString())
                 .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
                   message: updatedMessage,
                 });
