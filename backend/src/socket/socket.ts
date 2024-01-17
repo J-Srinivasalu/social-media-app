@@ -135,7 +135,11 @@ export function initializeSocketIO(io: Server) {
             missedCall(messageId, (updatedMessage) => {
               socket
                 .in(updatedMessage.receiver._id.toString())
-                .in(chatId)
+                .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
+                  message: updatedMessage,
+                });
+
+              socket
                 .in(updatedMessage.sender._id.toString())
                 .emit(ChatEventEnum.VIDEO_CALL_MISSED_EVENT, {
                   message: updatedMessage,
