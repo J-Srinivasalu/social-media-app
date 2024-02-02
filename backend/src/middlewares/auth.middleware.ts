@@ -26,7 +26,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-function handleJwtError(res: Response, error: any) {
+export function handleJwtError(res: Response, error: any) {
   if (error instanceof TokenExpiredError) {
     return handleApiError(
       res,

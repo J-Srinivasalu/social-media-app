@@ -13,6 +13,7 @@ import handleApiError from "../utils/apiErrorHandler";
 import jwt from "jsonwebtoken";
 import config from "../config/config";
 import { AuthenticatedRequest, DecodedRefreshToken } from "../utils/types.util";
+import { handleJwtError } from "../middlewares/auth.middleware";
 
 const registerSchema = z.object({
   fullName: z.string().min(1),
@@ -166,6 +167,6 @@ export async function refreshAccessTokenController(
     );
     res.status(200).json(apiResponse);
   } catch (error) {
-    handleApiError(res, error);
+    handleJwtError(res, error);
   }
 }
