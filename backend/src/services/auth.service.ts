@@ -73,21 +73,29 @@ export async function generateAccessAndRefreshToken(
   id: string,
   refreshToken: string
 ) {
-  const foundUser = await checkIfUserExistThenReturnUser(id);
+  try {
+    const foundUser = await checkIfUserExistThenReturnUser(id);
 
-  if (foundUser.refreshToken !== refreshToken) {
+    if (foundUser.refreshToken !== refreshToken) {
+      throw new ApiError(
+        401,
+        "Unauthorized",
+        "Refresh token expired or already used"
+      );
+    }
+
+    const token = generateAccessToken(foundUser);
+    const newRefreshToken = generateRefreshToken(foundUser._id.toString());
+
+    foundUser.refreshToken = newRefreshToken;
+    foundUser.save();
+
+    return { token, newRefreshToken };
+  } catch (error) {
     throw new ApiError(
       401,
       "Unauthorized",
       "Refresh token expired or already used"
     );
   }
-
-  const token = generateAccessToken(foundUser);
-  const newRefreshToken = generateRefreshToken(foundUser._id.toString());
-
-  foundUser.refreshToken = newRefreshToken;
-  foundUser.save();
-
-  return { token, newRefreshToken };
 }

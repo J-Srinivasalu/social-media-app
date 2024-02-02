@@ -167,6 +167,6 @@ export async function refreshAccessTokenController(
     );
     res.status(200).json(apiResponse);
   } catch (error) {
-    handleJwtError(res, error);
+    handleApiError(res, error);
   }
 }
