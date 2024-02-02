@@ -167,6 +167,10 @@ export async function refreshAccessTokenController(
     );
     res.status(200).json(apiResponse);
   } catch (error) {
-    handleApiError(res, error);
+    console.log(`Error occured: ${error}`);
+    handleApiError(
+      res,
+      new ApiError(401, "Unauthorized", "Refresh token expired or already used")
+    );
   }
 }
